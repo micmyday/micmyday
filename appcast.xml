@@ -1,0 +1,24 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>MicMyDay</title>
+        <description>Updates for MicMyDay.</description>
+        <language>en</language>
+        <item>
+            <title>0.9.3</title>
+            <pubDate>Mon, 21 Sep 2026 10:41:41 +0000</pubDate>
+            <sparkle:version>11</sparkle:version>
+            <sparkle:shortVersionString>0.9.3</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>MicMyDay 0.9.3</h3>
+<p>The first public release.</p>
+<ul>
+  <li>Hold your shortcut, speak, and the words land in whatever app you were already in.</li>
+  <li>Transcription runs on your Mac with Whisper, Parakeet or Nemotron, or through OpenAI or Gemini if you prefer.</li>
+  <li>Rewrite profiles turn what you said into a tidied note, a message, or an instruction for a coding agent.</li>
+  <li>A recording with no voice in it is dropped rather than guessed at.</li>
+</ul>]]></description>
+            <enclosure url="https://github.com/micmyday/micmyday/releases/download/v0.9.3/MicMyDay.dmg" length="22958882" type="application/octet-stream" sparkle:edSignature="eehT4ntZadWD3HQBUX2YY5E6YXrPUpfTRho4wqMJxDvbr/Mt02zIeBu0YLCO+9m097ggLxmjl5y1ItVZwZhLBA==" />
+        </item>
+    </channel>
+</rss>
