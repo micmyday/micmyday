@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# The downloaded xcframeworks only. `make vendor` fetches them, so they are not
+# worth versioning, but the pattern has to be anchored: MicMyDay/Vendor holds
+# our own source and must not be swept up with them.
+/Vendor/

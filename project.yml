@@ -1,0 +1,113 @@
+name: MicMyDay
+
+options:
+  bundleIdPrefix: com.alexander-liesenfeld
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    # Apple Silicon only: the local engines rely on Metal, and Intel is not
+    # supported or tested. Building fat would offer the app to Macs we do not
+    # ship for.
+    ARCHS: arm64
+    ONLY_ACTIVE_ARCH: NO
+    CLANG_ENABLE_MODULES: YES
+
+packages:
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: 2.6.0
+  FluidAudio:
+    url: https://github.com/FluidInference/FluidAudio
+    revision: ec07aabfa6990133fee483705432b4cbd4dbe7d5
+
+targets:
+  MicMyDay:
+    type: application
+    platform: macOS
+    sources:
+      - path: MicMyDay
+        excludes:
+          - Resources/Info.plist
+          - Resources/MicMyDay-Bridging-Header.h
+    dependencies:
+      - framework: Vendor/whisper.xcframework
+        embed: true
+      - framework: Vendor/llama.xcframework
+        embed: true
+      - package: FluidAudio
+      - package: Sparkle
+        codeSign: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.micmyday.app
+        PRODUCT_NAME: MicMyDay
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_FILE: MicMyDay/Resources/Info.plist
+        SWIFT_OBJC_BRIDGING_HEADER: MicMyDay/Resources/MicMyDay-Bridging-Header.h
+        USER_HEADER_SEARCH_PATHS: $(SRCROOT)/MicMyDay/Vendor
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: 3RF6SSDYFS
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_APP_SANDBOX: YES
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
+        # Set LOCAL_BUILD=LOCAL_BUILD in the environment to compile a build
+        # that is licensed by definition and never updates itself, which is
+        # what building from source should give you. Empty for every ordinary
+        # build, so the distributed one can never pick it up by accident; the
+        # release script refuses to publish a binary that carries it.
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) ${LOCAL_BUILD}"
+      configs:
+        # Release is provisioned by Xcode for team 3RF6SSDYFS. The archive
+        # itself is development-signed; `xcodebuild -exportArchive` with
+        # Distribution/ExportOptions-AppStore.plist re-signs it with the Apple
+        # Distribution identity and the Mac App Store profile, creating both in
+        # the developer account on first run thanks to
+        # -allowProvisioningUpdates (see the Makefile's archive target).
+        # Naming a distribution identity here instead would conflict with
+        # automatic signing and fail the archive.
+        Release:
+          CODE_SIGN_STYLE: Automatic
+    entitlements:
+      path: MicMyDay/Resources/MicMyDay.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.device.audio-input: true
+        com.apple.security.device.microphone: true
+        com.apple.security.network.client: true
+        com.apple.security.files.user-selected.read-only: true
+
+  MicMyDayTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: MicMyDayTests
+    dependencies:
+      - target: MicMyDay
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.micmyday.app.tests
+        GENERATE_INFOPLIST_FILE: YES
+        # Instantiated by XCTest as the bundle loads, which is what lets it
+        # register an observer and free whisper's Metal context before the C++
+        # destructors run. Without it the test host aborts as it exits, leaving
+        # a crash report behind even when every test passed.
+        INFOPLIST_KEY_NSPrincipalClass: TestHostTeardown
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "Apple Development"
+        DEVELOPMENT_TEAM: 3RF6SSDYFS
+
+schemes:
+  MicMyDay:
+    build:
+      targets:
+        MicMyDay: all
+        MicMyDayTests: [test]
+    test:
+      targets:
+        - MicMyDayTests

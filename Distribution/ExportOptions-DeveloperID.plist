@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Developer ID, not app-store-connect: this build is downloaded from a
+         website and has to launch on a Mac that has never seen the App Store.
+         The App Store options next to this file are for a submission that
+         Apple signs; the two cannot be interchanged. -->
+    <key>method</key>
+    <string>developer-id</string>
+    <key>destination</key>
+    <string>export</string>
+    <key>teamID</key>
+    <string>3RF6SSDYFS</string>
+    <key>signingStyle</key>
+    <string>automatic</string>
+    <!-- The release script sets the version before archiving, so Xcode must
+         not take it upon itself to change it afterwards. -->
+    <key>manageAppVersionAndBuildNumber</key>
+    <false/>
+    <key>stripSwiftSymbols</key>
+    <true/>
+</dict>
+</plist>

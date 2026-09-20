@@ -1,0 +1,72 @@
+MicMyDay — third-party notices
+
+Speech engine: whisper.cpp / ggml
+https://github.com/ggml-org/whisper.cpp
+Build dependency: b4938 (see Makefile).
+
+MIT License
+
+Copyright (c) 2023-2026 The ggml authors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Downloaded Whisper models
+Original: https://github.com/openai/whisper
+GGML conversions: https://huggingface.co/ggerganov/whisper.cpp
+The download catalog includes full-precision and quantized conversions.
+
+MIT License
+
+Copyright (c) 2022 OpenAI
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Downloaded Parakeet models
+
+Parakeet TDT 0.6B v3 by NVIDIA
+Original model and attribution: https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+Licensed under Creative Commons Attribution 4.0 International:
+https://creativecommons.org/licenses/by/4.0/
+Legal text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+MicMyDay downloads GGUF conversions supplied by ggml-org:
+https://huggingface.co/ggml-org/parakeet-GGUF
+These files convert the original model format; Q8_0 also quantizes its weights.
+MicMyDay does not train or further modify these downloaded weights. The
+conversion repository labels its work MIT; the original NVIDIA weights remain
+subject to their CC BY 4.0 terms. No endorsement by NVIDIA or ggml-org is implied.
+
+Model weights are downloaded on request, not bundled executable plug-ins.
+All trademarks belong to their respective owners.

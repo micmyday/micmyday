@@ -1,0 +1,14 @@
+MicMyDay
+
+Copyright (c) 2026 Alexander Liesenfeld.
+
+MicMyDay is open source software, published under the GNU General Public
+License, version 3. The source code is available at:
+
+    https://github.com/micmyday/micmyday
+
+This copy is the prepared, signed and notarised build offered as a paid
+download. It is licensed to you under the same GPL, version 3: the purchase
+buys the finished application and supports continued development, not a
+different licence. The full licence text is in the LICENSE file of the
+repository above.

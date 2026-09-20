@@ -1,0 +1,50 @@
+MicMyDay Privacy
+Last updated: 8 September 2026
+Developer: Alexander Liesenfeld
+
+Your choice of processing
+
+MicMyDay records your microphone when you start dictation. If you enable voice activation, it keeps listening while that mode is active. You can stop listening in the app. MicMyDay does not include advertising or analytics SDKs, and does not send your dictation to a MicMyDay-operated server.
+
+With a downloaded Whisper or Parakeet model, speech recognition runs on your Mac. Downloading a model connects to Hugging Face and its download infrastructure, which receive normal network information such as your IP address and the requested model. Downloaded models stay in the app's storage until you remove them.
+
+Apple Speech uses Apple's speech-recognition service. When on-device processing is selected, MicMyDay requires it and reports an error if it is unavailable. If you allow server processing, Apple may receive your recording and vocabulary hints.
+
+If you select a cloud or custom transcription provider, your recording, language, model selection and vocabulary hints are sent directly to that endpoint. If you enable AI rewriting, the transcript and rewrite instructions go to the selected rewrite provider. Local speech recognition does not make cloud rewriting local.
+
+With Gemini transcription, MicMyDay compresses your recording on your Mac before sending it to Google's Gemini API. Model discovery also contacts Google using your API key. MicMyDay requests that interactions are not stored as retrievable conversations; Google's API data processing and retention terms still apply.
+
+Before sharing audio or text with a provider, MicMyDay asks for your approval. The destination and type of content are shown. Provider account credentials accompany requests when configured. Providers may link requests to your account and may retain data under their own terms. A home server or localhost service is also a separate destination; its operator controls processing and retention. HTTP connections to local servers are not encrypted. Internet endpoints must use HTTPS.
+
+Review your provider's privacy policy and account settings before sending sensitive material. Reset MicMyDay's sharing approvals in Settings → Permissions to be asked again. Resetting approvals cannot recall information already sent to a provider.
+
+Storage on your Mac
+
+Recordings use temporary files in the app's sandbox. MicMyDay attempts to remove them after processing or cancellation; a crash or interrupted operation can leave temporary files for macOS to clean up. The app does not keep an audio recording library.
+
+If recent transcripts are enabled, they are saved locally in the app's sandbox between launches, up to the limit you choose (50 by default). They include spoken and rewritten text, time, selected engine/profile and destination app name. The history file has owner-only permissions and is excluded from backups. It is never sent to a provider as history. Clearing history or turning recent transcripts off deletes the saved file. The app also holds the most recent result in memory while running.
+
+Delivered text is copied to the macOS clipboard and, if allowed, pasted into the app you were using. Clipboard contents can remain after MicMyDay quits and can be accessed or synced by macOS or other apps. Clear the clipboard separately if needed. Pasted text is then handled by the destination app.
+
+Preferences and custom rewrite prompts are stored locally in the app's settings. API keys, tokens and custom request-header values are stored in Keychain. Removing an app does not necessarily remove its Keychain entries. You can clear credentials in MicMyDay's provider settings before removing it.
+
+Permissions
+
+Microphone access enables recording. Speech Recognition permission is only needed for Apple Speech. Accessibility/event-posting access enables the paste shortcut; without it you can paste from the clipboard yourself. Input Monitoring is only needed for modifier-only shortcuts, and MicMyDay listens for modifier changes rather than typed text. Local Network access is used to reach providers on your network, not to read your Wi-Fi password or network name. macOS permissions can be changed in System Settings → Privacy & Security.
+
+Third-party services
+
+Provider terms and privacy practices are controlled by the service you choose. Relevant policies include:
+Apple: https://www.apple.com/legal/privacy/
+OpenAI: https://openai.com/policies/privacy-policy/
+Google Gemini API: https://ai.google.dev/gemini-api/terms
+Hugging Face: https://huggingface.co/privacy
+
+For a custom endpoint, consult its operator. Review this information again if you change providers or enable a new processing feature.
+
+Contact
+
+Questions about this policy or about MicMyDay: hello@micmyday.com
+Developer: Alexander Liesenfeld
+Privacy policy: https://micmyday.com/privacy/
+Support: https://micmyday.com/support/
