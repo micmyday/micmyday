@@ -1017,9 +1017,10 @@ final class SettingsStore: ObservableObject {
         // words need it, and a stored choice still wins for anyone who
         // already picked.
         overlayStyle = OverlayStyle(rawValue: defaults.string(forKey: Key.overlayStyle) ?? "") ?? .dock
-        // The app's own palette until somebody picks otherwise, so an
-        // existing install sees exactly the Dock it had before.
-        overlayDockStyle = DockStyle(rawValue: defaults.string(forKey: Key.overlayDockStyle) ?? "") ?? .theme
+        // Obsidian until somebody picks otherwise. Only an install that has
+        // never chosen a style is affected: choosing one writes the key, so a
+        // Dock somebody set themselves is never changed out from under them.
+        overlayDockStyle = DockStyle(rawValue: defaults.string(forKey: Key.overlayDockStyle) ?? "") ?? .obsidian
         overlayElapsedLine = defaults.object(forKey: Key.overlayElapsedLine) as? Bool ?? false
         // On unless turned off. The maximum is a cliff: the take stops
         // wherever it has got to, and the words being spoken at that moment

@@ -166,6 +166,7 @@
 		F457504A0C7D54CE161A09BE /* SettingsWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 78085E8190E1F909312A3CA1 /* SettingsWindowView.swift */; };
 		F608F060733453A05A40918B /* RewriteReadinessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B5E19E4531FCC8EAA32CEB6 /* RewriteReadinessTests.swift */; };
 		F626B4AE9EC07CD1606A5581 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E249B61DA2D94671BC355092 /* AppState.swift */; };
+		F9822A4540F04DDDC4636CDF /* OverlayChapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96BF1EA17700D579DAFBAC3C /* OverlayChapter.swift */; };
 		FA0F69F8A97DB14A0546104D /* EngineChapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46345F1F416D6199B2FFB39B /* EngineChapter.swift */; };
 		FDEA1C1337A8AFA39B38CD6B /* SpokenLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C15818879D9FBADBB7CF60 /* SpokenLanguage.swift */; };
 /* End PBXBuildFile section */
@@ -291,6 +292,7 @@
 		944B181283B993F3236208ED /* VoiceActivityDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceActivityDetector.swift; sourceTree = "<group>"; };
 		94973530497A974DF6F2EFD7 /* TextInjectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInjectorTests.swift; sourceTree = "<group>"; };
 		95437222E2F15289B0C60774 /* PermissionConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionConfigurationTests.swift; sourceTree = "<group>"; };
+		96BF1EA17700D579DAFBAC3C /* OverlayChapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayChapter.swift; sourceTree = "<group>"; };
 		9769EDACFED569407E8AC847 /* MicMyDayPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicMyDayPalette.swift; sourceTree = "<group>"; };
 		97CEEE40BFE76A050FED9616 /* LlamaBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LlamaBridge.m; sourceTree = "<group>"; };
 		97F40496ADEE8ACAD6C82DB7 /* TestHostTeardown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHostTeardown.swift; sourceTree = "<group>"; };
@@ -516,6 +518,7 @@
 				46345F1F416D6199B2FFB39B /* EngineChapter.swift */,
 				652258A0B55CC8D2F0AEFEC5 /* GeminiConnectSection.swift */,
 				0FF80534597D9D546912D600 /* OnboardingView.swift */,
+				96BF1EA17700D579DAFBAC3C /* OverlayChapter.swift */,
 				BE6064EFECA036AF22019AFC /* ProfilesChapter.swift */,
 				0CB530517D7434E7DABD31C3 /* ReadyChapter.swift */,
 				746C75926913F1550104B160 /* RewriteChapter.swift */,
@@ -814,6 +817,7 @@
 				82D4733A3DBDC89C29BCC7B0 /* NemotronLiveTranscriber.swift in Sources */,
 				9E8323362A7753BFE57978BD /* OnboardingView.swift in Sources */,
 				1B9423965A667FD556D6F8CC /* OpenAICompatibleTranscriber.swift in Sources */,
+				F9822A4540F04DDDC4636CDF /* OverlayChapter.swift in Sources */,
 				12D111805D52EECE88885FDB /* OverlayController.swift in Sources */,
 				692EE0B07BDB8630D0B0CA16 /* OverlayPane.swift in Sources */,
 				CFAC4DADA1AF37AAD0039C1C /* OverlaySettings.swift in Sources */,

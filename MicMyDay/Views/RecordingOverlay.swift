@@ -69,7 +69,7 @@ struct RecordingOverlay: View {
     var style: OverlayStyle = .pill
     /// Which surface the Dock draws itself on. Ignored by the pill, which has
     /// one look and takes it from the theme.
-    var dockStyle: DockStyle = .theme
+    var dockStyle: DockStyle = .obsidian
     let size: OverlaySize
     let level: Double
     let elapsed: String

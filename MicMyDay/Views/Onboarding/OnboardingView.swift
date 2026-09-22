@@ -2,7 +2,7 @@ import SwiftUI
 
 /// First-run setup, built to `Assets/Design/export/design/OnboardingBeacon.dc.html`.
 ///
-/// Seven chapters in a 288pt rail plus content. The rail doubles as a receipt:
+/// Eight chapters in a 288pt rail plus content. The rail doubles as a receipt:
 /// every visited chapter shows what was chosen, so the flow can be re-entered
 /// anywhere without hunting for what a screen decided.
 struct OnboardingView: View {
@@ -33,7 +33,7 @@ struct OnboardingView: View {
     /// Numbered by position, so the rail always reads 01 upward however
     /// many chapters there are.
     enum Chapter: Int, CaseIterable, Identifiable {
-        case access, engine, setup, voice, rewrite, profiles, ready
+        case access, engine, setup, voice, rewrite, profiles, overlay, ready
         var id: Int { rawValue }
     }
 
@@ -275,6 +275,7 @@ struct OnboardingView: View {
         case .voice: return SettingsPane.voice.title
         case .rewrite: return "Rewrite"
         case .profiles: return "Profiles"
+        case .overlay: return "Overlay"
         case .ready: return "Ready"
         }
     }
@@ -311,6 +312,11 @@ struct OnboardingView: View {
         case .profiles:
             guard settings.enhancementEnabled else { return nil }
             return settings.currentRewriteProfile?.name
+        case .overlay:
+            guard settings.overlayEnabled else { return "Off" }
+            return settings.overlayStyle == .dock
+                ? "Dock \u{00B7} \(settings.overlayDockStyle.title)"
+                : "Pill \u{00B7} \(settings.overlaySize.title)"
         case .ready:
             return nil
         }
@@ -427,6 +433,8 @@ struct OnboardingView: View {
             return rewriteConnected ? "Continue" : "Continue without rewriting"
         case .profiles:
             return "Continue"
+        case .overlay:
+            return "Continue"
         case .ready:
             return "Continue"
         }
@@ -447,6 +455,7 @@ struct OnboardingView: View {
         case .voice: VoiceChapter(capturing: $shortcutCapturing)
         case .rewrite: RewriteChapter()
         case .profiles: ProfilesChapter()
+        case .overlay: OverlayChapter()
         case .ready: ReadyChapter(launchAtLogin: $launchAtLogin, start: complete)
         }
     }

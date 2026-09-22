@@ -36,7 +36,7 @@ struct IndicatorState {
     /// How much the shape shows, for the shapes that vary with it.
     var size: OverlaySize = .wide
     /// Which surface the Dock wears. The pill has one look and ignores it.
-    var dockStyle: DockStyle = .theme
+    var dockStyle: DockStyle = .obsidian
     let onStop: (() -> Void)?
     /// The armed profile is the one thing on the indicator you cannot work
     /// out from anything else on screen, and the one that changes what lands

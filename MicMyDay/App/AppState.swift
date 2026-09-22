@@ -1201,7 +1201,13 @@ final class AppState: ObservableObject {
         if windowIsOpen != wasOpen {
             if windowIsOpen { startPermissionPolling() } else { stopPermissionPolling() }
         }
-        if settingsWindow?.isVisible != true { setOverlayPreviewing(false) }
+        // Two windows ask for the live overlay: Settings → Overlay, and the
+        // onboarding chapter that asks the same question. Each turns it off
+        // when its own page goes away; this is the backstop for the case that
+        // cannot, a window closed while one of those pages was open.
+        if settingsWindow?.isVisible != true, onboardingWindow?.isVisible != true {
+            setOverlayPreviewing(false)
+        }
         // A menu-bar-only app has no Dock icon and no Cmd-Tab entry, so a
         // window that slips behind another app looks closed and cannot be
         // found again. While any window is open, appear in the Dock so one

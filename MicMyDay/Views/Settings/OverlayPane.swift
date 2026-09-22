@@ -126,7 +126,8 @@ struct OverlayPane: View {
 }
 
 /// One shape to choose from, drawn rather than only described.
-private struct StyleCard: View {
+/// Shared with the onboarding overlay chapter, which asks the same question.
+struct StyleCard: View {
     let option: OverlayStyle
     let selected: Bool
     let choose: () -> Void
@@ -170,7 +171,8 @@ private struct StyleCard: View {
     }
 }
 
-private struct SizeCard: View {
+/// Shared with the onboarding overlay chapter, which asks the same question.
+struct SizeCard: View {
     let option: OverlaySize
     let selected: Bool
     let choose: () -> Void
@@ -221,7 +223,8 @@ private struct SizeCard: View {
 /// controls sit on a tray. So the swatch is the panel itself at half width —
 /// two lines of words, a stop button, a meter, the profile chip and the
 /// time-remaining line, in the style's own colours.
-private struct DockStyleCard: View {
+/// Shared with the onboarding overlay chapter, which asks the same question.
+struct DockStyleCard: View {
     let option: DockStyle
     let selected: Bool
     let choose: () -> Void

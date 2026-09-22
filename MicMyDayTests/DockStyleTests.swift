@@ -46,10 +46,11 @@ final class DockStyleTests: XCTestCase {
         XCTAssertEqual(first, second)
     }
 
-    /// An existing install has no stored choice, and must not wake up wearing
-    /// a design it never picked.
+    /// A fresh install gets Obsidian, and one that chose for itself keeps
+    /// what it chose. The second half is the part that matters: the default
+    /// moved once already, and it must never move a Dock somebody set.
     @MainActor
-    func testTheDefaultIsTheAppsOwnTheme() {
+    func testTheDefaultIsObsidian() {
         let name = "DockStyleTests.default"
         let defaults = UserDefaults(suiteName: name)!
         defaults.removePersistentDomain(forName: name)
@@ -59,7 +60,7 @@ final class DockStyleTests: XCTestCase {
             defaults: defaults,
             keychain: KeychainStore(service: "DockStyleTests.\(UUID().uuidString)")
         )
-        XCTAssertEqual(fresh.overlayDockStyle, .theme)
+        XCTAssertEqual(fresh.overlayDockStyle, .obsidian)
 
         defaults.set("iris", forKey: "overlayDockStyle")
         let returning = SettingsStore(
@@ -73,7 +74,7 @@ final class DockStyleTests: XCTestCase {
     /// must land on something that draws rather than leaving the overlay with
     /// no surface at all.
     @MainActor
-    func testAnUnknownStoredDesignFallsBackToTheTheme() {
+    func testAnUnknownStoredDesignFallsBackToTheDefault() {
         let name = "DockStyleTests.unknown"
         let defaults = UserDefaults(suiteName: name)!
         defaults.removePersistentDomain(forName: name)
@@ -84,6 +85,6 @@ final class DockStyleTests: XCTestCase {
             defaults: defaults,
             keychain: KeychainStore(service: "DockStyleTests.\(UUID().uuidString)")
         )
-        XCTAssertEqual(settings.overlayDockStyle, .theme)
+        XCTAssertEqual(settings.overlayDockStyle, .obsidian)
     }
 }
