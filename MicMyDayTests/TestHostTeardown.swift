@@ -23,6 +23,25 @@ final class TestHostTeardown: NSObject, XCTestObservation {
         // Freed explicitly, before the C++ destructors run, which is the whole
         // point: by the time `atexit` handlers fire it is too late to do this
         // and the assert has already tripped.
-        _ = WhisperCppEngine.shared.unloadForTermination()
+        //
+        // Both engines, for the same reason the app frees both. whisper.cpp
+        // and llama.cpp each carry their own copy of ggml, each with its own
+        // list of Metal devices torn down at exit, and each asserting about
+        // its own residency sets. Freeing one leaves the other to abort, which
+        // is precisely what happened while only the transcriber was unloaded:
+        // runs failed in llama's copy of ggml-metal rather than whisper's.
+        let transcriber = WhisperCppEngine.shared.unloadForTermination()
+        let rewriter = LlamaCppEngine.shared.unloadForTermination()
+
+        // Said out loud rather than discarded. An unload that times out leaves
+        // the run heading for the same abort, and the crash report that
+        // follows names ggml rather than anything here — so the one line that
+        // would explain it has to be printed before the process dies.
+        if !transcriber || !rewriter {
+            let stuck = [transcriber ? nil : "transcriber", rewriter ? nil : "rewriter"]
+                .compactMap { $0 }
+                .joined(separator: " and ")
+            print("TestHostTeardown: the \(stuck) did not unload in time; this run may abort in ggml at exit.")
+        }
     }
 }
