@@ -33,6 +33,7 @@
 		2B827722DDEB545765E674EE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F099AF86C8229AD89B32FF76 /* Assets.xcassets */; };
 		2BAD330ADE913193B27FDF41 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = 300194614131F14F8BC6C2FF /* Sparkle */; };
 		2F33FEE8CFE527415CA1FB52 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1BD2A4F3F9C44E69993038D /* MenuBarView.swift */; };
+		310096A357E3A369F2D03416 /* DockStyleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34A75D6E8EE93C2759A18E18 /* DockStyleTests.swift */; };
 		31B21D0E4CE732DBD0B68EC1 /* AppleOnDeviceRewriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66850195E92141CD202C8A99 /* AppleOnDeviceRewriter.swift */; };
 		327688A11D5883D90F087AA5 /* Wordmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3ECF51AAE25895C5E08405 /* Wordmark.swift */; };
 		351FF33353373FE5430AA97A /* ParakeetSilenceProbeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5553291324870135022C5772 /* ParakeetSilenceProbeTests.swift */; };
@@ -130,6 +131,7 @@
 		C063DF10A36BFD477812E0B0 /* TestHostTeardown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97F40496ADEE8ACAD6C82DB7 /* TestHostTeardown.swift */; };
 		C1172CE65B5040C2768A8108 /* ProfilesChapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE6064EFECA036AF22019AFC /* ProfilesChapter.swift */; };
 		C2EF4839B670EA73B5DFF32A /* PreviewStabilizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00F2A88D646DD335E1091050 /* PreviewStabilizer.swift */; };
+		C3B9B05B7450FCEF05136DD1 /* DockStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B34DC01AF86E7314C45734 /* DockStyle.swift */; };
 		C3E1ED9381DCC6BF5D456295 /* RewriteModelCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649412D0C9B35B3AA785D230 /* RewriteModelCatalog.swift */; };
 		C6BDBB3738B6157C88C50FC5 /* UsageStatisticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58123F3BD80A5D5F3ECC9D6 /* UsageStatisticsTests.swift */; };
 		C77D3B783BE7362812D708C3 /* AudioInputDeviceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA120D250A093695E7E89011 /* AudioInputDeviceManagerTests.swift */; };
@@ -225,6 +227,7 @@
 		2CE806FF8EA2B314DD5520E6 /* OverlayPreparationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayPreparationTests.swift; sourceTree = "<group>"; };
 		316AF3EA6EF8B1FB9A2A296D /* UserInteractionWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInteractionWatcher.swift; sourceTree = "<group>"; };
 		3259970B85A625F5018A986C /* HotKeyManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotKeyManager.swift; sourceTree = "<group>"; };
+		34A75D6E8EE93C2759A18E18 /* DockStyleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockStyleTests.swift; sourceTree = "<group>"; };
 		384373746A1645110ADB1CA1 /* HistoryWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryWindowView.swift; sourceTree = "<group>"; };
 		3927BF4E8A4FBF11C9E54F27 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
 		39B41E3D4D1FA54560D73E32 /* whisper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = whisper.xcframework; path = Vendor/whisper.xcframework; sourceTree = "<group>"; };
@@ -318,6 +321,7 @@
 		BF0DF38FE788F113126953EA /* SystemAudioDucker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemAudioDucker.swift; sourceTree = "<group>"; };
 		BF70C75E2E92A2762612B02F /* WhisperModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhisperModelManager.swift; sourceTree = "<group>"; };
 		BFCC9D618CCE2E5554839417 /* VoiceActivationListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceActivationListener.swift; sourceTree = "<group>"; };
+		C2B34DC01AF86E7314C45734 /* DockStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockStyle.swift; sourceTree = "<group>"; };
 		C3E41508170E1BAF549636FF /* RewriteProfiles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewriteProfiles.swift; sourceTree = "<group>"; };
 		C52813131C0F4CC53049CF7A /* TranscriptEnhancerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptEnhancerTests.swift; sourceTree = "<group>"; };
 		C89F9DC3804F8E6D7233A57E /* LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -376,6 +380,7 @@
 				4F069DAB0D96F95C0B595DED /* AppSettings.swift */,
 				03E3E0994F71E8DAF1091167 /* AppTheme.swift */,
 				D51E96BBDBF0C2CE434BF8E7 /* ChatPromptFormat.swift */,
+				C2B34DC01AF86E7314C45734 /* DockStyle.swift */,
 				AA96E5229A1C7D8DE29BF876 /* EngineCatalog.swift */,
 				B9F84E7A5DCF9BADEE4733EB /* FillerWords.swift */,
 				883043F85C576BF0FAEE5E90 /* LicenseState.swift */,
@@ -447,6 +452,7 @@
 				23A874F4780815F2F47157FE /* ClipboardRewriteTests.swift */,
 				F4E6AB624DFA426A90A34CEF /* DataSharingConsentTests.swift */,
 				EE4020CD7EABC414A7E52B1D /* DictationCancellationTests.swift */,
+				34A75D6E8EE93C2759A18E18 /* DockStyleTests.swift */,
 				FC66F5665318471778AB7099 /* EngineLanguageSupportTests.swift */,
 				A0211EFF891A10683C1071D1 /* FillerWordsTests.swift */,
 				4BE27369B4FBCB8D1408CD04 /* GeminiTests.swift */,
@@ -777,6 +783,7 @@
 				7DA2064E98B86C06A568DD15 /* DSComponents.swift in Sources */,
 				CF62C906B66BEA95A249DBA0 /* DataSharingConsent.swift in Sources */,
 				572BDC90696319FC39A428D4 /* DesignTokens.swift in Sources */,
+				C3B9B05B7450FCEF05136DD1 /* DockStyle.swift in Sources */,
 				23D4BBFE0267931FE9BC2795 /* EngineCatalog.swift in Sources */,
 				FA0F69F8A97DB14A0546104D /* EngineChapter.swift in Sources */,
 				0D64110E68423DB367DADF5B /* EnginePane.swift in Sources */,
@@ -872,6 +879,7 @@
 				DF4F2C34FE7F6E693C76D2C4 /* ClipboardRewriteTests.swift in Sources */,
 				B2236F71B27695007E5B1FDE /* DataSharingConsentTests.swift in Sources */,
 				8958B7AE49CEEE0C929933E1 /* DictationCancellationTests.swift in Sources */,
+				310096A357E3A369F2D03416 /* DockStyleTests.swift in Sources */,
 				8B153EF53780AFBFEB7B854B /* EngineLanguageSupportTests.swift in Sources */,
 				938F30D70222209AC020C03B /* FillerWordsTests.swift in Sources */,
 				8C0B269D100218A797D1293E /* GeminiTests.swift in Sources */,

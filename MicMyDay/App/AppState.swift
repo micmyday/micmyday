@@ -3085,6 +3085,7 @@ final class AppState: ObservableObject {
         let view = RecordingOverlay(
             content: content,
             style: settings.overlayStyle,
+            dockStyle: settings.overlayDockStyle,
             size: settings.overlaySize,
             level: overlayPreviewing && !phase.isRecording ? Double.random(in: 0.25...0.85) : Double(inputLevel),
             elapsed: overlayElapsed,

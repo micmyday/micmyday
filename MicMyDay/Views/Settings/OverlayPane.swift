@@ -63,6 +63,30 @@ struct OverlayPane: View {
                 }
             }
 
+            // Only the Dock has a surface to choose, and the choice is
+            // meaningless while the pill is the shape, so it is asked only
+            // where it applies.
+            if settings.overlayStyle == .dock {
+                SettingsCard(
+                    eyebrow: "Dock design",
+                    caption: "How the dock itself is drawn. Theme follows the app's own colours; the rest are designs of their own, previewed on screen while these settings are open."
+                ) {
+                    LazyVGrid(
+                        columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 3),
+                        spacing: 10
+                    ) {
+                        ForEach(DockStyle.allCases) { option in
+                            DockStyleCard(
+                                option: option,
+                                selected: settings.overlayDockStyle == option
+                            ) {
+                                settings.overlayDockStyle = option
+                            }
+                        }
+                    }
+                }
+            }
+
             // Only the Dock draws one, so it is only asked about there.
             if settings.overlayStyle == .dock {
                 SettingsCard(
@@ -188,6 +212,184 @@ private struct SizeCard: View {
         .buttonStyle(.plain)
         .focusEffectDisabled()
     }
+}
+
+/// One Dock design to choose from, drawn as a miniature of the real thing.
+///
+/// A name and a colour chip could not tell these apart: half of what separates
+/// them is the corner, the frame, the weight of the fill and whether the
+/// controls sit on a tray. So the swatch is the panel itself at half width —
+/// two lines of words, a stop button, a meter, the profile chip and the
+/// time-remaining line, in the style's own colours.
+private struct DockStyleCard: View {
+    let option: DockStyle
+    let selected: Bool
+    let choose: () -> Void
+
+    private var surface: DockSurface { option.surface(tint: .mfRecord) }
+
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: min(surface.cornerRadius, 22), style: .continuous)
+    }
+
+    /// Stands in for the desktop, so the translucent styles read as
+    /// translucent rather than as whatever colour they happen to resolve to
+    /// against the settings window.
+    private var wallpaper: some View {
+        LinearGradient(
+            colors: [Color(hex: 0x4C5673), Color(hex: 0x272D3C)],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    @ViewBuilder
+    private var fill: some View {
+        switch surface.body {
+        case let .solid(color):
+            color
+        case let .gradient(stops, start, end):
+            LinearGradient(gradient: Gradient(stops: stops), startPoint: start, endPoint: end)
+        case let .material(tint, _):
+            tint
+        }
+    }
+
+    private var preview: some View {
+        ZStack {
+            wallpaper
+            fill
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Capsule().fill(surface.settled).frame(height: 3)
+                    Capsule().fill(surface.tentative).frame(width: 52, height: 3)
+                }
+                .padding(.horizontal, surface.paddingX * 0.7)
+                .padding(.top, 9)
+
+                Spacer(minLength: 6)
+
+                HStack(spacing: 6) {
+                    RoundedRectangle(
+                        cornerRadius: min(surface.stopRadius * 0.55, 6),
+                        style: .continuous
+                    )
+                    .fill(surface.stopFill)
+                    .overlay {
+                        if let stroke = surface.stopStroke {
+                            RoundedRectangle(cornerRadius: min(surface.stopRadius * 0.55, 6), style: .continuous)
+                                .strokeBorder(stroke.color, lineWidth: stroke.width)
+                        }
+                    }
+                    .frame(width: 12, height: 12)
+
+                    HStack(alignment: .center, spacing: 1.5) {
+                        ForEach(Array(Self.bars.enumerated()), id: \.offset) { _, value in
+                            RoundedRectangle(cornerRadius: surface.meterBarRadius * 0.6, style: .continuous)
+                                .fill(surface.meterTop ?? surface.meter)
+                                .frame(width: 1.6, height: 3 + value * 7)
+                        }
+                    }
+
+                    Spacer(minLength: 4)
+
+                    RoundedRectangle(cornerRadius: min(surface.chipRadius, 4), style: .continuous)
+                        .fill(surface.chipFill)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: min(surface.chipRadius, 4), style: .continuous)
+                                .strokeBorder(
+                                    surface.chipStroke?.color ?? surface.chipText.opacity(0.35),
+                                    lineWidth: 0.5
+                                )
+                        }
+                        .frame(width: 26, height: 9)
+                }
+                .padding(.horizontal, surface.paddingX * 0.7)
+                .frame(height: surface.rowHeight * 0.62)
+                .background(alignment: .top) {
+                    if let tray = surface.tray {
+                        ZStack(alignment: .top) {
+                            tray.fill
+                            Rectangle().fill(tray.hairline).frame(height: 1)
+                        }
+                    }
+                }
+
+                Rectangle()
+                    .fill(surface.progress)
+                    .frame(width: 44, height: 2)
+                    .padding(.leading, 8)
+            }
+        }
+        .frame(height: 62)
+        .clipShape(shape)
+        .overlay {
+            if let highlight = surface.topHighlight {
+                Rectangle()
+                    .fill(highlight.color)
+                    .frame(height: highlight.width)
+                    .padding(.horizontal, surface.cornerRadius)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            }
+        }
+        .overlay {
+            // Only the outermost hairline: the swatch is too small for
+            // Carbon's three to read as anything but a thick edge.
+            if let stroke = surface.frame.first {
+                shape.strokeBorder(stroke.color, lineWidth: stroke.width)
+            }
+        }
+        .overlay {
+            // Still, unlike the real one. Eighteen swatches each turning a
+            // gradient would be the busiest thing in Settings.
+            if case .auroraRing = surface.special {
+                AngularGradient(colors: DockSurface.auroraRing, center: .center)
+                    .scaleEffect(2)
+                    .mask { shape.strokeBorder(.black, lineWidth: 1.5) }
+            }
+        }
+    }
+
+    var body: some View {
+        Button(action: choose) {
+            VStack(alignment: .leading, spacing: 8) {
+                preview
+                HStack(spacing: 4) {
+                    Text(option.title)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(Color.mfTextPrimary)
+                        .lineLimit(1)
+                    if selected {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(Color.mfAccent)
+                    }
+                }
+            }
+            .padding(10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(selected ? Color.mfAccent.opacity(0.16) : Color.mfFill(0.04))
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(
+                        selected ? Color.mfAccent : Color.mfFill(0.08),
+                        lineWidth: selected ? 1.5 : 1
+                    )
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .focusEffectDisabled()
+        .accessibilityLabel("\(option.title). \(option.detail)")
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    /// A fixed trace rather than a random one: the swatches sit side by side,
+    /// and eighteen different shapes would read as eighteen different meters.
+    private static let bars: [CGFloat] = [0.2, 0.45, 0.7, 1, 0.75, 0.4, 0.22]
 }
 
 /// A picture of the result rather than a list of names: a miniature screen with

@@ -48,10 +48,28 @@ struct RecordingOverlay: View {
     /// competes with the icon itself.
     private static let profileBadgeRing: CGFloat = 1.5
 
+    /// The height the preview panel holds open before a word has been said:
+    /// four lines of its own 13pt type, plus the 3pt set between them.
+    ///
+    /// Four because that is what the Dock reserves, and an indicator should
+    /// not change size when you change its shape. Written as the sum it is
+    /// rather than the total it comes to, so that changing the type or the
+    /// spacing above carries through instead of quietly going wrong.
+    private static let previewLineHeight: CGFloat = 15.6
+    private static let previewLineSpacing: CGFloat = 3
+    private static let previewReservedLines: CGFloat = 4
+    private static var reservedPreviewHeight: CGFloat {
+        previewReservedLines * previewLineHeight
+            + (previewReservedLines - 1) * previewLineSpacing
+    }
+
     let content: OverlayContent
     /// Which shape to draw. The pill's own arrangement is below; the others
     /// are separate views taking the same facts.
     var style: OverlayStyle = .pill
+    /// Which surface the Dock draws itself on. Ignored by the pill, which has
+    /// one look and takes it from the theme.
+    var dockStyle: DockStyle = .theme
     let size: OverlaySize
     let level: Double
     let elapsed: String
@@ -143,6 +161,7 @@ struct RecordingOverlay: View {
             showsWords: livePreviewEnabled,
             progress: progress,
             size: size,
+            dockStyle: dockStyle,
             onStop: onStop,
             profiles: profiles,
             onSelectProfile: onSelectProfile,
@@ -217,13 +236,12 @@ struct RecordingOverlay: View {
 
     // MARK: - Live preview
 
-    /// The words the panel shows, or nil when it has nothing to say: the
-    /// preview is off, the phase has no words, or none have arrived yet.
+    /// The words the panel shows, or nil when there is no panel: the preview
+    /// is off, the phase has no words, or none have arrived yet.
     ///
-    /// The panel grows upward as the words accumulate — a tight trim read as
-    /// a two-line ticker, which was confusing rather than reassuring. The
-    /// cap that remains is only there so a marathon take cannot fill the
-    /// screen; at normal dictation lengths everything said stays visible.
+    /// Until the first word the pill stands alone, exactly as it does with the
+    /// preview turned off. The word is what opens the panel, and it opens at
+    /// its full four rows rather than growing into them.
     private var preview: (words: [String], firm: Int)? {
         guard livePreviewEnabled else { return nil }
         switch content {
@@ -250,10 +268,11 @@ struct RecordingOverlay: View {
 
     /// No status chrome in here — no kicker, no dot, no spinner. The pill
     /// already carries phase; this panel is only ever about the words.
+    ///
     private func previewPanel(_ words: [String], firm: Int) -> some View {
         previewText(words, firm: firm)
             .font(.system(size: 13))
-            .lineSpacing(3)
+            .lineSpacing(Self.previewLineSpacing)
             .multilineTextAlignment(.leading)
             // A fixed width, not a cap: the design calls for a 420pt panel,
             // and the flexible version (maxWidth plus a vertical fixedSize)
@@ -261,6 +280,15 @@ struct RecordingOverlay: View {
             // three-thousand-point minimum height, throwing the pill off the
             // screen.
             .frame(width: 392, alignment: .leading)
+            // Four rows the moment the panel exists, the same count the Dock
+            // opens to, so the two shapes agree on how much of what you said
+            // is worth keeping on screen. A minimum rather than a fixed
+            // height: unlike the Dock this panel is not clipped, so a long
+            // take still grows past it rather than losing the tail.
+            //
+            // Anchored at the top, so the words start where reading starts and
+            // stay put as the rest arrive underneath.
+            .frame(minHeight: Self.reservedPreviewHeight, alignment: .topLeading)
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
             .background {

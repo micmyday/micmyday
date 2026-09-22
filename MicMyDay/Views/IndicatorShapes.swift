@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 /// Everything an indicator needs to draw itself, whichever shape it is.
@@ -34,6 +35,8 @@ struct IndicatorState {
     var progress: Double? = nil
     /// How much the shape shows, for the shapes that vary with it.
     var size: OverlaySize = .wide
+    /// Which surface the Dock wears. The pill has one look and ignores it.
+    var dockStyle: DockStyle = .theme
     let onStop: (() -> Void)?
     /// The armed profile is the one thing on the indicator you cannot work
     /// out from anything else on screen, and the one that changes what lands
@@ -92,8 +95,15 @@ struct IndicatorState {
 struct IndicatorMeter: View {
     let level: Double
     let tint: Color
+    /// The top of a vertical gradient running down to `tint`, for the one
+    /// style whose meter is two colours. Nil is the flat fill everywhere else.
+    var topTint: Color? = nil
     var listening: Bool = true
     var bars: Int = 13
+    var barWidth: CGFloat = 2.5
+    /// Nil is the capsule the Dock has always drawn; a style that wants square
+    /// or barely-rounded bars says so.
+    var barRadius: CGFloat? = nil
     /// Redrawn on every level change, so each frame gets fresh jitter. Held
     /// in state rather than computed inline because a view body must not
     /// depend on a random number: SwiftUI may run it more than once for the
@@ -110,9 +120,9 @@ struct IndicatorMeter: View {
         HStack(alignment: .center, spacing: 2) {
             ForEach(0 ..< bars, id: \.self) { index in
                 let value = index < heights.count ? heights[index] : 0.12
-                Capsule()
-                    .fill(tint)
-                    .frame(width: 2.5, height: Self.floorHeight + value * Self.reach)
+                RoundedRectangle(cornerRadius: barRadius ?? barWidth / 2, style: .continuous)
+                    .fill(fill)
+                    .frame(width: barWidth, height: Self.floorHeight + value * Self.reach)
                     .opacity(listening ? 0.45 + value * 0.55 : 0.2)
             }
         }
@@ -120,6 +130,18 @@ struct IndicatorMeter: View {
         .animation(.linear(duration: 0.1), value: heights)
         .onAppear { heights = Self.sample(level: level, bars: bars) }
         .onChange(of: level) { _, new in heights = Self.sample(level: new, bars: bars) }
+    }
+
+    /// Flat unless the style asks for two colours, in which case the bars are
+    /// one gradient cut into thirteen pieces rather than thirteen gradients:
+    /// each bar is a different height, so filling them separately would put
+    /// the colour change at a different place in every one.
+    private var fill: LinearGradient {
+        LinearGradient(
+            colors: topTint.map { [$0, tint] } ?? [tint, tint],
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
 
     /// The shortest a bar ever is, so a closed microphone still shows a trace
@@ -158,19 +180,34 @@ struct IndicatorMeter: View {
 /// of them: ending a dictation must never mean finding the menu bar.
 struct IndicatorStopButton: View {
     let tint: Color
+    /// The square inside it. Usually the colour that reads on `tint`; in the
+    /// outlined styles the fill is clear and this is the only colour there is.
+    var glyph: Color = .white
     let diameter: CGFloat
+    /// Half the diameter or more is a circle; less is a rounded square.
+    var cornerRadius: CGFloat? = nil
+    var stroke: DockSurface.Stroke? = nil
+    var glow: Color? = nil
     let onStop: () -> Void
+
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: min(cornerRadius ?? diameter / 2, diameter / 2), style: .continuous)
+    }
 
     var body: some View {
         Button(action: onStop) {
             ZStack {
-                Circle().fill(tint)
+                shape.fill(tint)
+                if let stroke {
+                    shape.strokeBorder(stroke.color, lineWidth: stroke.width)
+                }
                 Image(systemName: "stop.fill")
                     .font(.system(size: diameter * 0.35, weight: .bold))
-                    .foregroundStyle(Color.mfOnRecord)
+                    .foregroundStyle(glyph)
             }
             .frame(width: diameter, height: diameter)
-            .contentShape(Circle())
+            .shadow(color: glow ?? .clear, radius: glow == nil ? 0 : 10)
+            .contentShape(shape)
         }
         .buttonStyle(.plain)
         .focusEffectDisabled()
@@ -238,6 +275,10 @@ extension View {
 /// you stop, and finding that out too late means dictating the passage again.
 struct IndicatorProfile: View {
     let state: IndicatorState
+    /// The chip's treatment, which is one of the things a Dock style changes:
+    /// a tinted pill in most, an outline in two, a small rounded rectangle in
+    /// the HUD and tray styles.
+    let surface: DockSurface
     var compact: Bool = false
 
     var body: some View {
@@ -267,11 +308,21 @@ struct IndicatorProfile: View {
         }
     }
 
+    /// The chip is about twenty points tall, so a radius asking for a pill is
+    /// clamped to half of that rather than left at the design's 999.
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: min(surface.chipRadius, 10), style: .continuous)
+    }
+
     private func face(_ name: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: state.profileSymbol).font(.system(size: 9))
             if !compact {
-                Text(name).font(.system(size: 10, weight: .medium)).lineLimit(1)
+                Text(name)
+                    .font(surface.typeface == .mono
+                        ? .system(size: 10, weight: .medium, design: .monospaced)
+                        : .system(size: 10, weight: .medium))
+                    .lineLimit(1)
             }
             // A quiet chevron, so it reads as something you can open rather
             // than a label that happens to be next to the time.
@@ -281,11 +332,16 @@ struct IndicatorProfile: View {
                     .opacity(0.55)
             }
         }
-        .foregroundStyle(Color.mfAccent)
+        .foregroundStyle(surface.chipText)
         .padding(.horizontal, 6)
         .padding(.vertical, 4)
-        .background(Color.mfAccent.opacity(0.12), in: Capsule())
-        .contentShape(Capsule())
+        .background(surface.chipFill, in: shape)
+        .overlay {
+            if let stroke = surface.chipStroke {
+                shape.strokeBorder(stroke.color, lineWidth: stroke.width)
+            }
+        }
+        .contentShape(shape)
     }
 }
 
@@ -301,72 +357,84 @@ struct IndicatorProfile: View {
 struct DockIndicator: View {
     let state: IndicatorState
 
-    /// The tallest the words have needed so far in this take.
-    ///
-    /// The panel opens as the form without a preview and grows a line at a
-    /// time as the words fill it, up to four, and there it stays.
-    ///
-    /// A high-water mark rather than the current measurement, which is the
-    /// whole difference between this and the version that was rejected
-    /// before. Following the text exactly made the panel pump throughout a
-    /// dictation: tall when a phrase landed, short again in the gap before
-    /// the next one, short once more while the transcript cleared for the
-    /// rewrite. Growth that never reverses has no pump in it, because within
-    /// one take the panel only ever settles into a size it has already
-    /// earned.
-    @State private var grown = GrownWords()
+    /// What the words come to when nothing constrains them, which is the only
+    /// thing the panel needs to know to tell "it fits" from "it does not".
+    /// Not a high-water mark: it may fall as well as rise, because a rewrite
+    /// can replace a long draft with a short result.
+    @State private var naturalWordsHeight: CGFloat = 0
 
-    /// The tallest the words have needed, and which take that was.
+    /// What the chosen style is made of. Every colour, radius and inset below
+    /// comes from here rather than from the palette, which is the whole of the
+    /// difference between one style and the next.
+    private var surface: DockSurface { state.dockStyle.surface(tint: state.tint) }
+
+    /// The panel's two forms, and the whole of what distinguishes them.
     ///
-    /// The take is stored beside the height rather than cleared by a separate
-    /// change handler, because a handler runs after the body it would have
-    /// corrected. The panel is drawn once at the previous take's height
-    /// before the reset arrives, which reads as the indicator appearing too
-    /// tall and then settling: exactly one frame of the wrong answer, which
-    /// is enough to see. Carrying the take inside the value means the body
-    /// can never read a height that belongs to a different dictation.
-    private struct GrownWords: Equatable {
-        var take = -1
-        var height: CGFloat = 0
-    }
+    /// Closed, it is the indicator somebody with the preview turned off sees,
+    /// exactly — same width, same height, same everything. Turning the preview
+    /// on changes nothing at all until there is something to preview, and the
+    /// first word is what opens it.
+    private var wordsOpen: Bool { state.showsWords && !state.words.isEmpty }
 
-    private var grownTo: CGFloat { grown.take == state.take ? grown.height : 0 }
-
-    /// A compact baseline for the controls, with extra reading room when
-    /// live text is enabled. Controls keep their natural width when needed.
-    private var width: CGFloat { state.showsWords ? 365 : 330 }
+    /// A compact baseline for the controls, with extra reading room once the
+    /// words are there to need it. Controls keep their natural width regardless.
+    private var width: CGFloat { wordsOpen ? 365 : 330 }
 
     private var height: CGFloat? {
-        guard state.showsWords else { return 44 }
-        return 44 + wordsHeight
+        guard wordsOpen else { return surface.rowHeight }
+        return surface.rowHeight + wordsHeight + trayGap
     }
 
-    /// Clamped to whole lines so the panel arrives at a resting place rather
-    /// than tracking the text's height continuously, which would creep by a
-    /// point or two as a line filled up.
-    private var wordsHeight: CGFloat {
-        guard grownTo > 0 else { return 0 }
-        let lines = min(Self.maximumLines, max(1, (grownTo / Self.lineHeight).rounded(.up)))
-        return Self.wordsPadding + lines * Self.lineHeight
+    /// Nothing, or all four lines. There is no size in between.
+    ///
+    /// The panel used to gain a line at a time as the text filled it, keeping
+    /// a high-water mark so it could never shrink mid-take. That removed the
+    /// pumping an earlier version had, but it still meant the thing floating
+    /// over your work changed size four times while you were talking to it.
+    ///
+    /// Two sizes and one move between them is quieter than four. It costs a
+    /// panel larger than a one-line dictation strictly needs, which is the
+    /// trade: a shape that settles once is worth more here than a tight one,
+    /// because the panel sits in your peripheral vision and it is movement the
+    /// eye catches there, not size.
+    private var wordsHeight: CGFloat { wordsOpen ? fullWordsHeight : 0 }
+
+    /// Whether the words have outgrown the four rows, which decides both which
+    /// edge they are anchored to and which edge, if any, is faded.
+    private var overflowing: Bool { naturalWordsHeight > wordsHeight }
+
+    /// The tray styles put the control row on a raised band, and text sitting
+    /// straight on the edge of it reads as though it has fallen in.
+    private var trayGap: CGFloat { surface.tray == nil ? 0 : 10 }
+
+    /// The words' own font, at the four point line spacing set below.
+    private var wordsFont: Font {
+        switch surface.typeface {
+        case .system: return .system(size: 13)
+        case .mono: return .system(size: 12, design: .monospaced)
+        }
     }
 
-    /// Font 13 at the four point line spacing set below.
-    private static let lineHeight: CGFloat = 19.6
+    private var lineHeight: CGFloat { surface.typeface == .mono ? 18.4 : 19.6 }
+
     private static let maximumLines: CGFloat = 4
     private static let wordsPadding: CGFloat = 12
-    /// The full word area, which is what four lines come to. Kept as a
-    /// constant because the mask below is expressed as a fraction of it.
-    private static let fullWordsHeight: CGFloat = wordsPadding + maximumLines * lineHeight
+    /// The full word area, which is what four lines come to. The mask below is
+    /// expressed as a fraction of it, and the box the panel grows inside is
+    /// measured from it.
+    private var fullWordsHeight: CGFloat { Self.wordsPadding + Self.maximumLines * lineHeight }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Present but empty until the first words arrive, so the panel
-            // starts at the same height as the form without a preview.
+            // Closed to nothing until the first word, then open at its full
+            // four lines. The height carries the animation; the text inside is
+            // the same view throughout, so nothing is torn down and rebuilt at
+            // the moment the panel opens.
             if state.showsWords {
                 Text(state.words)
-                    .font(.system(size: 13))
+                    .font(wordsFont)
                     .lineSpacing(4)
-                    .foregroundStyle(Color.mfTextPrimary.opacity(state.firm ? 0.95 : 0.5))
+                    .foregroundStyle(state.firm ? surface.settled : surface.tentative)
                     // Its full natural height, however many lines that is.
                     // Without this the text is fitted to the box instead and
                     // ends in an ellipsis, which puts the truncation at the
@@ -375,16 +443,14 @@ struct DockIndicator: View {
                     // finished long ago.
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 14)
-                    // Anchored at the bottom, so a take that outgrows the
-                    // panel scrolls off the top and the newest line always
-                    // sits just above the controls. A short phrase still
-                    // starts where reading starts, because until the text
-                    // fills the box the two anchors put it in the same place.
-                    // What the words actually need, reported rather than
-                    // guessed at: a line count computed here would have to
-                    // repeat the wrapping the text has already done, and
-                    // would be wrong at any accessibility text size.
+                    .padding(.horizontal, surface.paddingX)
+                    // The slack the four rows are measured with, spent above
+                    // the text rather than left below it. Top-aligned without
+                    // this the first line sits hard against the panel's edge,
+                    // which reads as the words having been pushed out of it.
+                    // Inside the measurement on purpose: the height compared
+                    // against the box has to be the height the box will hold.
+                    .padding(.top, Self.wordsPadding)
                     .background(
                         GeometryReader { geometry in
                             Color.clear.preference(
@@ -393,22 +459,43 @@ struct DockIndicator: View {
                             )
                         }
                     )
-                    .frame(height: wordsHeight, alignment: .bottomLeading)
+                    // Top until the words outgrow the four rows, bottom after.
+                    //
+                    // Both anchors are the same thing said twice: keep reading
+                    // where reading starts, and never let the line being
+                    // spoken right now be the one that is cut off. While the
+                    // text fits, those agree and the top is where it sits.
+                    // Once it does not, holding the top would freeze the panel
+                    // on the opening of a sentence finished long ago.
+                    .frame(
+                        height: wordsHeight,
+                        alignment: overflowing ? .bottomLeading : .topLeading
+                    )
                     .clipped()
                     // A line cut in half by the top edge reads as damage.
                     // Fading the last few points turns it into text passing
                     // out of view, which is what it is.
+                    //
+                    // Only while there is something passing out of view. Text
+                    // that fits is anchored at the top, and a fade there would
+                    // dim the first line of a transcript nothing is scrolling.
                     .mask(
                         LinearGradient(
-                            stops: [
-                                .init(color: .clear, location: 0),
-                                .init(color: .black, location: 16 / Self.fullWordsHeight),
-                                .init(color: .black, location: 1),
-                            ],
+                            stops: overflowing
+                                ? [
+                                    .init(color: .clear, location: 0),
+                                    .init(color: .black, location: 16 / fullWordsHeight),
+                                    .init(color: .black, location: 1),
+                                ]
+                                : [
+                                    .init(color: .black, location: 0),
+                                    .init(color: .black, location: 1),
+                                ],
                             startPoint: .top,
                             endPoint: .bottom
                         )
                     )
+                    .padding(.bottom, wordsOpen ? trayGap : 0)
             }
             controls
         }
@@ -421,27 +508,32 @@ struct DockIndicator: View {
         // decides where the text wraps.
         .frame(
             minWidth: width,
-            maxWidth: state.showsWords ? width : nil,
+            maxWidth: wordsOpen ? width : nil,
             minHeight: height,
             maxHeight: height,
             alignment: .bottom
         )
-        .background(RecordingOverlay.fill, in: RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
+        .background { panelFill.clipShape(shape) }
         .overlay(alignment: .bottomLeading) { elapsedLine }
-        .clipShape(RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous)
-                .strokeBorder(Color.mfFill(0.07), lineWidth: 1)
-        }
+        .clipShape(shape)
+        .overlay { topHighlight }
+        .overlay { frameStrokes }
+        .overlay { auroraRing }
         .indicatorDraggable(state.onDrag)
         // Inside the window's 34pt transparent margin. The design's 24pt
         // radius at a 20pt drop reaches 44pt below the panel, past the edge
         // of the window drawing it, and the part that did not fit was sliced
         // off square.
-        .shadow(color: .black.opacity(0.62), radius: 16, y: 10)
-        .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
+        .shadow(color: surface.shadow.color, radius: surface.shadow.radius, y: surface.shadow.y)
+        .shadow(
+            color: surface.secondShadow?.color ?? .clear,
+            radius: surface.secondShadow?.radius ?? 0,
+            y: surface.secondShadow?.y ?? 0
+        )
         .animation(.easeOut(duration: 0.4), value: width)
         .animation(.easeOut(duration: 0.4), value: height)
+        .animation(.easeOut(duration: 0.25), value: state.dockStyle)
+        .onPreferenceChange(WordsHeightKey.self) { naturalWordsHeight = $0 }
         // Held inside a box the size of the panel's largest form, so the
         // window around it never changes size while the panel grows.
         //
@@ -454,43 +546,70 @@ struct DockIndicator: View {
         // animation. With the box constant there is nothing left for the
         // window to do, and the only thing moving is the panel itself.
         .frame(
-            height: state.showsWords ? 44 + Self.fullWordsHeight : nil,
+            height: state.showsWords ? surface.rowHeight + fullWordsHeight + trayGap : nil,
             alignment: state.growsDownward ? .top : .bottom
         )
-        .onPreferenceChange(WordsHeightKey.self) { measured in
-            // Upward only, and only within one take. The reset below is what
-            // makes "within one take" true.
-            //
-            // An empty string is not a measurement worth keeping: it still
-            // lays out as one empty line, so accepting it would open every
-            // take one line tall instead of at the small form.
-            guard !state.words.isEmpty else { return }
-            if grown.take != state.take {
-                grown = GrownWords(take: state.take, height: measured)
-            } else if measured > grown.height {
-                grown.height = measured
-            }
-        }
-
     }
 
-    /// The design's own periwinkle, rather than whichever accent the theme
-    /// happens to carry.
-    ///
-    /// The mock was drawn on the Indigo palette, where the accent is this
-    /// colour, and the line reads as a cool measure running under a warm
-    /// recording light. Taking the theme's accent instead made it yellow on
-    /// yellow under Sunrise, where it stops being a second thing and becomes
-    /// a brighter part of the first.
-    /// Sixteen rather than the design's twenty: at 44pt tall the corner was
-    /// taking nearly half the height, which reads as a lozenge rather than a
-    /// panel, and the shape now opens at that height on every take.
-    static let cornerRadius: CGFloat = 16
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: surface.cornerRadius, style: .continuous)
+    }
+
+    /// The panel's own material: a flat colour, a gradient, or a translucent
+    /// tint over whatever the window is floating above.
+    @ViewBuilder
+    private var panelFill: some View {
+        switch surface.body {
+        case let .solid(color):
+            color
+        case let .gradient(stops, start, end):
+            LinearGradient(gradient: Gradient(stops: stops), startPoint: start, endPoint: end)
+        case let .material(tint, light):
+            DockBlur(light: light, cornerRadius: surface.cornerRadius).overlay(tint)
+        }
+    }
+
+    /// Hairlines drawn inside the edge, outermost first, each inset past the
+    /// ones before it. Carbon's frame is three of them: a hairline, two points
+    /// of body, then a second hairline.
+    @ViewBuilder
+    private var frameStrokes: some View {
+        let widths = surface.frame.map(\.width)
+        ForEach(Array(surface.frame.enumerated()), id: \.offset) { index, stroke in
+            let inset = widths.prefix(index).reduce(0, +)
+            RoundedRectangle(cornerRadius: max(0, surface.cornerRadius - inset), style: .continuous)
+                .strokeBorder(stroke.color, lineWidth: stroke.width)
+                .padding(inset)
+        }
+    }
+
+    /// A lit top edge, which is what keeps the gradient styles from reading as
+    /// flat rectangles. Inset past the corners, where a straight line drawn
+    /// over a curve would show as two bright stubs.
+    @ViewBuilder
+    private var topHighlight: some View {
+        if let highlight = surface.topHighlight {
+            Rectangle()
+                .fill(highlight.color)
+                .frame(height: highlight.width)
+                .padding(.horizontal, surface.cornerRadius)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+    }
+
+    @ViewBuilder
+    private var auroraRing: some View {
+        if case .auroraRing = surface.special {
+            DockAuroraRing(
+                cornerRadius: surface.cornerRadius,
+                listening: state.isRecording,
+                resting: surface.mark
+            )
+        }
+    }
 
     /// Where the elapsed line begins, measured from the panel's left edge.
     private static let elapsedStart: CGFloat = 15
-
-    private static let elapsedTint = Color(red: 0.647, green: 0.682, blue: 1)
 
     /// How much of the maximum recording length has gone, as a hairline
     /// along the bottom edge.
@@ -519,7 +638,10 @@ struct DockIndicator: View {
                 )
                 .fill(
                     LinearGradient(
-                        colors: [Self.elapsedTint.opacity(0.35), Self.elapsedTint],
+                        colors: [
+                            (surface.progressLead ?? surface.progress).opacity(0.35),
+                            surface.progress,
+                        ],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
@@ -543,12 +665,20 @@ struct DockIndicator: View {
     private var controls: some View {
         HStack(spacing: 11) {
             if let onStop = state.onStop {
-                IndicatorStopButton(tint: state.tint, diameter: 26, onStop: onStop)
+                IndicatorStopButton(
+                    tint: surface.stopFill,
+                    glyph: surface.stopGlyph,
+                    diameter: surface.stopDiameter,
+                    cornerRadius: surface.stopRadius,
+                    stroke: surface.stopStroke,
+                    glow: surface.stopGlow,
+                    onStop: onStop
+                )
             } else {
                 Image(systemName: state.markSymbol)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(state.tint)
-                    .frame(width: 26)
+                    .foregroundStyle(surface.mark)
+                    .frame(width: surface.stopDiameter)
             }
 
             if let note = state.note {
@@ -558,20 +688,25 @@ struct DockIndicator: View {
                 // carries words when it has any to say.
                 Text(note)
                     .font(DSFont.ui(12, .semibold))
-                    .foregroundStyle(state.tint)
+                    .foregroundStyle(surface.mark)
                     .lineLimit(1)
                     .fixedSize()
                     .transition(.opacity)
             } else if state.isRecording {
-                IndicatorMeter(level: state.level, tint: state.tint)
+                IndicatorMeter(
+                    level: state.level,
+                    tint: surface.meter,
+                    topTint: surface.meterTop,
+                    barRadius: surface.meterBarRadius
+                )
             } else {
                 Text(state.kicker)
                     .font(DSFont.ui(12, .medium))
-                    // Held back from the full tint. At full strength the word
-                    // was the brightest thing in the row, which put it ahead
-                    // of the stop button and the clock; it is a caption for
-                    // the state, not the state itself.
-                    .foregroundStyle(state.tint.opacity(0.7))
+                    // Held back from the full mark colour. At full strength
+                    // the word was the brightest thing in the row, which put
+                    // it ahead of the stop button and the clock; it is a
+                    // caption for the state, not the state itself.
+                    .foregroundStyle(surface.kicker)
                     // Never broken across lines: the row is one line tall, so
                     // a second one is drawn outside it.
                     .lineLimit(1)
@@ -580,28 +715,119 @@ struct DockIndicator: View {
 
             Spacer(minLength: 6)
 
-            IndicatorProfile(state: state)
+            IndicatorProfile(state: state, surface: surface)
 
             Text(state.elapsed)
                 .font(.system(size: 10, design: .monospaced))
-                .foregroundStyle(Color.mfTextPrimary.opacity(0.45))
+                .foregroundStyle(surface.elapsed)
                 // Its natural width, always. Squeezed by a long phase label
                 // beside the armed profile, the clock collapsed to an
                 // ellipsis, which is the one thing it can say that is worse
                 // than saying nothing.
                 .fixedSize()
         }
-        .padding(.horizontal, 14)
-        .frame(height: 44)
+        .padding(.horizontal, surface.paddingX)
+        .frame(height: surface.rowHeight)
+        .background(alignment: .top) { trayBacking }
         .animation(.easeOut(duration: 0.25), value: state.note)
+    }
+
+    /// The raised band the two tray styles put the controls on, with the
+    /// hairline that separates it from the words above.
+    @ViewBuilder
+    private var trayBacking: some View {
+        if let tray = surface.tray {
+            ZStack(alignment: .top) {
+                tray.fill
+                Rectangle().fill(tray.hairline).frame(height: 1)
+            }
+        }
     }
 }
 
-
-/// The height the words come to once wrapped, reported by the text itself.
+/// What the glass styles are made of: the desktop behind the panel, blurred.
+///
+/// SwiftUI's own materials are tied to the appearance of the window they are
+/// in, and the overlay's window has no appearance worth speaking of — it is a
+/// borderless transparent panel. Going to AppKit directly is what lets a light
+/// style stay light while the app is in a dark theme, and the other way round.
+/// The height the words come to once wrapped, reported by the text itself
+/// rather than computed here: a line count worked out in code would have to
+/// repeat the wrapping the text has already done, and would be wrong at any
+/// accessibility text size.
 private struct WordsHeightKey: PreferenceKey {
     static let defaultValue: CGFloat = 0
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = max(value, nextValue())
+    }
+}
+
+private struct DockBlur: NSViewRepresentable {
+    let light: Bool
+    /// Rounded by the view's own layer rather than by the `clipShape` around
+    /// it. A SwiftUI clip is a mask on the SwiftUI layer tree, and an AppKit
+    /// view hosted inside it is not in that tree: left to the clip, every
+    /// glass style would have square corners inside a rounded panel.
+    let cornerRadius: CGFloat
+
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = .hudWindow
+        // Behind the window rather than within it: there is nothing inside
+        // this panel to blur, and the point is the desktop underneath.
+        view.blendingMode = .behindWindow
+        // Active regardless of whether the app is frontmost, which it almost
+        // never is while dictating.
+        view.state = .active
+        view.wantsLayer = true
+        view.layer?.masksToBounds = true
+        // The same curve SwiftUI's continuous corners draw, so the blur's
+        // edge follows the frame drawn over it rather than cutting inside it.
+        view.layer?.cornerCurve = .continuous
+        return view
+    }
+
+    func updateNSView(_ view: NSVisualEffectView, context: Context) {
+        view.appearance = NSAppearance(named: light ? .aqua : .darkAqua)
+        view.layer?.cornerRadius = cornerRadius
+    }
+}
+
+/// Aurora's edge: a 1.5pt ring turning once every five seconds.
+///
+/// The gradient starts and ends on the same yellow, so the sweep has no seam
+/// in it to catch the eye on each turn. It is scaled up before it is masked
+/// because rotating a gradient the size of the panel would swing its corners
+/// out of frame; an angular gradient is the same at any radius, so growing it
+/// costs nothing and covers every angle.
+private struct DockAuroraRing: View {
+    let cornerRadius: CGFloat
+    /// Turning while the microphone is open; a still periwinkle ring once the
+    /// words have gone off to be rewritten.
+    let listening: Bool
+    let resting: Color
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var turned = false
+
+    private var shape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+    }
+
+    var body: some View {
+        if listening {
+            AngularGradient(colors: DockSurface.auroraRing, center: .center)
+                .rotationEffect(.degrees(turned ? 360 : 0))
+                .scaleEffect(2)
+                .mask { shape.strokeBorder(.black, lineWidth: 1.5) }
+                .onAppear {
+                    guard !reduceMotion else { return }
+                    withAnimation(.linear(duration: 5).repeatForever(autoreverses: false)) {
+                        turned = true
+                    }
+                }
+        } else {
+            shape.strokeBorder(resting, lineWidth: 1.5)
+        }
     }
 }

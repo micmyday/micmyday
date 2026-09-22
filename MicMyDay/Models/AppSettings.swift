@@ -239,6 +239,7 @@ final class SettingsStore: ObservableObject {
         static let insertAgainShortcutCleared = "insertAgainShortcutCleared"
         static let overlayEnabled = "overlayEnabled"
         static let overlayStyle = "overlayStyle"
+        static let overlayDockStyle = "overlayDockStyle"
         static let overlayElapsedLine = "overlayElapsedLine"
         static let countdownBeforeMaximum = "countdownBeforeMaximum"
         static let overlaySize = "overlaySize"
@@ -746,6 +747,12 @@ final class SettingsStore: ObservableObject {
         didSet { defaults.set(overlayStyle.rawValue, forKey: Key.overlayStyle) }
     }
 
+    /// Which surface the Dock wears. Only the Dock has one, so it is only
+    /// offered while the Dock is the chosen shape.
+    @Published var overlayDockStyle: DockStyle {
+        didSet { defaults.set(overlayDockStyle.rawValue, forKey: Key.overlayDockStyle) }
+    }
+
     /// The Dock's hairline showing how much of the maximum has gone. Opt in,
     /// and only the Dock draws one, so it is offered only while the Dock is
     /// the chosen shape.
@@ -1010,6 +1017,9 @@ final class SettingsStore: ObservableObject {
         // words need it, and a stored choice still wins for anyone who
         // already picked.
         overlayStyle = OverlayStyle(rawValue: defaults.string(forKey: Key.overlayStyle) ?? "") ?? .dock
+        // The app's own palette until somebody picks otherwise, so an
+        // existing install sees exactly the Dock it had before.
+        overlayDockStyle = DockStyle(rawValue: defaults.string(forKey: Key.overlayDockStyle) ?? "") ?? .theme
         overlayElapsedLine = defaults.object(forKey: Key.overlayElapsedLine) as? Bool ?? false
         // On unless turned off. The maximum is a cliff: the take stops
         // wherever it has got to, and the words being spoken at that moment

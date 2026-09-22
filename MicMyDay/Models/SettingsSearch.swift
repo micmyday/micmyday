@@ -187,6 +187,15 @@ enum SettingsIndex {
             "style", "kind", "look", "pill", "dock",
             "panel", "appearance", "which indicator",
         ], fallbackCard: "Overlay"),
+        SettingsEntry(pane: .overlay, card: "Dock design", aliases: [
+            "dock style", "dock theme", "overlay theme", "overlay design",
+            "overlay colour", "overlay color", "skin", "surface", "material",
+            "glass", "blur", "dark overlay", "light overlay",
+            "aurora", "obsidian", "vibrancy", "daylight", "island",
+            "tinted glass", "outline", "slate", "aluminium", "aluminum",
+            "deep sea", "charcoal", "slate tray", "graphite", "carbon",
+            "dusk", "moss", "iris",
+        ], fallbackCard: "Overlay"),
         SettingsEntry(pane: .overlay, card: "Time remaining", aliases: [
             "progress", "countdown", "time left", "how long", "limit", "maximum",
             "bar", "line", "elapsed", "running out",
