@@ -243,7 +243,10 @@ final class TextInjector {
             }
             return .copiedOnly
         }
-        // Escape can land during the focus wait above. The words are already on
+        // The shortcut that asked for this paste may still be under the user's
+        // fingers; see the helper.
+        await Self.waitForShortcutModifiersToClear()
+        // Escape can land during the waits above. The words are already on
         // the clipboard, so the user loses nothing by stopping here.
         guard shouldProceed() else {
             Self.logger.notice("Automatic paste skipped; the dictation was cancelled")
@@ -841,6 +844,9 @@ final class TextInjector {
         }
         selectionCaptureActive = true
         defer { selectionCaptureActive = false }
+        // Before the change count is read, not after: a copy the user makes
+        // while this waits would otherwise be mistaken for their selection.
+        await Self.waitForShortcutModifiersToClear()
         let before = pasteboard.changeCount
 
         guard postCopyShortcut(targetPID: targetPID) else { return nil }
@@ -1049,6 +1055,43 @@ final class TextInjector {
                 value: UserInteractionWatcher.syntheticEventMarker
             )
         }
+    }
+
+    /// Waits for the modifier keys the shortcut was pressed with to come up.
+    ///
+    /// Command-V and Command-C go out at the HID tap, from a source carrying
+    /// the current hardware state, and the app in front resolves them against
+    /// the modifiers that are physically down at that moment. The shortcuts
+    /// that act at once — insert again, edit selection — post theirs about a
+    /// tenth of a second after the press, which is shorter than an ordinary
+    /// key press lasts: Control-Option-Command-V arrives where Command-V was
+    /// meant, and nothing is pasted at all. Nothing reports this; the user
+    /// presses the shortcut and sees no result.
+    ///
+    /// Costs nothing on every other path, where the keys came up seconds ago
+    /// while the audio was being transcribed. Bounded, so somebody who holds
+    /// the shortcut down still gets their paste, exactly as before.
+    static func waitForShortcutModifiersToClear() async {
+        // 700ms in 10ms steps: longer than a deliberate press, short enough
+        // that a delivery which waits the whole way still reads as immediate.
+        for _ in 0 ..< 70 {
+            if currentModifierFlags().intersection(Self.blockingModifiers).isEmpty { return }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        Self.logger.notice("Posted with modifier keys still held; the shortcut has been down for 700ms")
+    }
+
+    /// The modifiers that change what a posted Command-V or Command-C means.
+    /// Caps Lock is left out: it changes neither.
+    private static let blockingModifiers: CGEventFlags = [
+        .maskCommand, .maskControl, .maskAlternate, .maskShift,
+    ]
+
+    /// Injectable so tests can hold keys down: the hardware modifier state
+    /// cannot be simulated, and the failure the wait exists for only happens
+    /// while keys are down.
+    static var currentModifierFlags: () -> CGEventFlags = {
+        CGEventSource.flagsState(.combinedSessionState)
     }
 
     private func postPasteShortcut() -> Bool {

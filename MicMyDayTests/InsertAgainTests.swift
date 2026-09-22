@@ -1,4 +1,5 @@
 import Carbon
+import CoreGraphics
 import XCTest
 @testable import MicMyDay
 
@@ -85,6 +86,55 @@ final class InsertAgainTests: XCTestCase {
                     && other.modifiers == KeyboardShortcut.insertAgainDefault.modifiers,
                 "Two actions share a shortcut"
             )
+        }
+    }
+
+    // MARK: - Waiting for the shortcut keys to come up
+    //
+    // The shortcut is three modifiers and the same key the paste uses, and the
+    // delivery posts its Command-V about a tenth of a second after the press —
+    // less than an ordinary key press lasts. Posted while the keys are still
+    // down, that arrives as Control-Option-Command-V and nothing is pasted at
+    // all, silently. These cover the wait that prevents it.
+
+    private func withHeldModifiers(_ flags: @escaping () -> CGEventFlags, _ body: () async -> Void) async {
+        let previous = TextInjector.currentModifierFlags
+        TextInjector.currentModifierFlags = flags
+        await body()
+        TextInjector.currentModifierFlags = previous
+    }
+
+    func testItPostsStraightAwayWhenNoKeyIsHeld() async {
+        await withHeldModifiers({ [] }) {
+            let started = Date()
+            await TextInjector.waitForShortcutModifiersToClear()
+            XCTAssertLessThan(
+                Date().timeIntervalSince(started),
+                0.1,
+                "Every other delivery path comes through here with nothing held and must not be delayed"
+            )
+        }
+    }
+
+    func testItWaitsForTheShortcutToBeReleased() async {
+        let released = Date().addingTimeInterval(0.2)
+        await withHeldModifiers({ Date() < released ? [.maskCommand, .maskControl, .maskAlternate] : [] }) {
+            await TextInjector.waitForShortcutModifiersToClear()
+            XCTAssertGreaterThanOrEqual(
+                Date(),
+                released,
+                "Command-V went out while the user was still holding Control-Option-Command"
+            )
+        }
+    }
+
+    /// A shortcut held down deliberately must still paste. Waiting forever
+    /// would trade a paste that lands late for one that never lands.
+    func testItGivesUpOnAKeyThatIsNeverReleased() async {
+        await withHeldModifiers({ [.maskCommand] }) {
+            let started = Date()
+            await TextInjector.waitForShortcutModifiersToClear()
+            XCTAssertLessThan(Date().timeIntervalSince(started), 2.0)
         }
     }
 }
