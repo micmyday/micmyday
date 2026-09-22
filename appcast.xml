@@ -5,6 +5,21 @@
         <description>Updates for MicMyDay.</description>
         <language>en</language>
         <item>
+            <title>0.9.4</title>
+            <pubDate>Wed, 23 Sep 2026 10:57:19 +0000</pubDate>
+            <sparkle:version>12</sparkle:version>
+            <sparkle:shortVersionString>0.9.4</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>MicMyDay 0.9.4</h3>
+<ul>
+  <li>Insert again and edit selection now wait for the shortcut keys to come up before pasting. Pressed quickly, they used to paste nothing at all and say nothing about it.</li>
+  <li>The Dock indicator can wear one of several looks, chosen in Settings.</li>
+  <li>The live preview opens in one movement instead of growing a line at a time: until the first word it is the indicator you already know, and then it is that indicator with four rows of text.</li>
+  <li>The newest line of a long dictation stays on screen rather than scrolling out of reach.</li>
+</ul>]]></description>
+            <enclosure url="https://github.com/micmyday/micmyday/releases/download/v0.9.4/MicMyDay.dmg" length="23111425" type="application/octet-stream" sparkle:edSignature="zB3+cX0sMn+PoZSFCHrF6L6GXKu4/jgei96UvLn0vvZu90kiEUV65+bQ8gm/cO1sU5CNTEBHjEPl7SHglFyvCA==" />
+        </item>
+        <item>
             <title>0.9.3</title>
             <pubDate>Mon, 21 Sep 2026 10:41:41 +0000</pubDate>
             <sparkle:version>11</sparkle:version>
