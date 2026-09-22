@@ -5,6 +5,19 @@
         <description>Updates for MicMyDay.</description>
         <language>en</language>
         <item>
+            <title>0.9.5</title>
+            <pubDate>Wed, 23 Sep 2026 17:41:32 +0000</pubDate>
+            <sparkle:version>13</sparkle:version>
+            <sparkle:shortVersionString>0.9.5</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>MicMyDay 0.9.5</h3>
+<ul>
+  <li>Setup now asks how the overlay should look, with the real overlay on screen while you choose, so the first time you see it is no longer the first time you dictate.</li>
+  <li>Obsidian is the Dock's new default design. A design you picked yourself is left exactly as it was.</li>
+</ul>]]></description>
+            <enclosure url="https://github.com/micmyday/micmyday/releases/download/v0.9.5/MicMyDay.dmg" length="23118500" type="application/octet-stream" sparkle:edSignature="KNby0j5KD7r1T17U4jMaasCjDLhkpDKx4Jxe60o99IVv04lVB5JnC/8YPyJlx3zOJij9KiJLmkJDLKUUcneBCQ==" />
+        </item>
+        <item>
             <title>0.9.4</title>
             <pubDate>Wed, 23 Sep 2026 10:57:19 +0000</pubDate>
             <sparkle:version>12</sparkle:version>
