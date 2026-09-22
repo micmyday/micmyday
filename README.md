@@ -31,13 +31,26 @@ GPL-3.0. Third-party components are listed in `MicMyDay/Resources/ThirdPartyNoti
 
 ## Building
 
+Xcode, macOS 14 or later, Apple Silicon, and [XcodeGen](https://github.com/yonaskolb/XcodeGen):
+
 ```sh
-make build
-make test
-make run
+brew install xcodegen
 ```
 
-Xcode, macOS 14 or later, Apple Silicon.
+XcodeGen writes `MicMyDay.xcodeproj` from `project.yml`, and `make` runs it for
+you before every build, so the project file is never edited by hand. The first
+build also downloads the whisper.cpp and llama.cpp xcframeworks into `Vendor/`,
+which needs a network connection and takes a few minutes; later builds do not.
+
+```sh
+make build-local                 # the one to run
+make test
+```
+
+`make build-local` is the build to compile for yourself — see the next section
+for what the flag does. `make build` and `make run` produce the same app with
+the licence check and updater compiled in, which is only useful for working on
+those two things.
 
 ## Building from source, and what the paid download is for
 

@@ -12,9 +12,9 @@ every fix ships as a new release, so there are no maintained older lines.
 
 ## Reporting a vulnerability
 
-Please report vulnerabilities privately, through GitHub's private reporting:
+Please report vulnerabilities privately, through the support page:
 
-https://github.com/micmyday/micmyday/security/advisories/new
+https://micmyday.com/support/
 
 Include what you found, where in the code it lives if you know, and how to
 reproduce it. Please do not open a public issue for a security problem before

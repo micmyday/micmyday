@@ -1,0 +1,15 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions, setup help and feature ideas
+    url: https://discord.gg/59d3eTABXk
+    about: >
+      Choosing a model, building a rewrite profile, or anything that is not yet
+      a bug. Suggestions are welcome here rather than as issues.
+  - name: Direct support
+    url: https://micmyday.com/support/
+    about: Licences, downloads, and anything you would rather not discuss in public.
+  - name: Security vulnerability
+    url: https://micmyday.com/support/
+    about: >
+      Report privately, not as an issue. See SECURITY.md for what to include
+      and when to expect a reply.

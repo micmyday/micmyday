@@ -1,0 +1,93 @@
+name: Bug report
+description: Something in MicMyDay does not work the way it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not report a security vulnerability here. Those go through
+        [the support page](https://micmyday.com/support/), as described in
+        `SECURITY.md`.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what you got instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce it
+      description: >
+        The shortcut you pressed, what you said if it matters, and the app you
+        were dictating into. A case that fails every time is worth more than a
+        long description of one that failed once.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: MicMyDay version
+      description: Shown at the bottom of the Settings sidebar.
+      placeholder: "0.9.4"
+    validations:
+      required: true
+
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS version
+      placeholder: "15.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: engine
+    attributes:
+      label: Transcription engine
+      options:
+        - Whisper (on this Mac)
+        - Parakeet (on this Mac)
+        - Nemotron (on this Mac)
+        - Apple Speech
+        - OpenAI
+        - Gemini
+        - Custom endpoint
+        - Not sure / not relevant
+    validations:
+      required: true
+
+  - type: input
+    id: destination
+    attributes:
+      label: Destination app
+      description: >
+        Where the text was meant to land. Delivery problems are often specific
+        to one app, so this is usually the thing that identifies them.
+      placeholder: "Slack, Xcode, Safari…"
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Anything from Console
+      description: >
+        Optional. MicMyDay logs through the unified log, so
+        `log show --predicate 'subsystem == "com.micmyday.app"' --last 10m`
+        collects the recent entries. Check it for anything you would rather not
+        post before pasting it.
+      render: text
+
+  - type: checkboxes
+    id: build
+    attributes:
+      label: How you got this copy
+      options:
+        - label: I built it from source with `make build-local`
