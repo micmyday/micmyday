@@ -39,7 +39,16 @@ enum LicenseState: Equatable {
 
 /// How long the trial lasts and how long a licensed copy may go unverified.
 enum LicenseTerms {
-    static let trialDays = 7
+    /// What the website promises, which is the number that matters: somebody
+    /// who read "free for 14 days" and was stopped on the seventh would be
+    /// right to say so in public, and right that it was not what they were
+    /// told.
+    ///
+    /// The same fourteen as `offlineGraceDays` below by coincidence, not by
+    /// design. They answer different questions — how long an unlicensed copy
+    /// runs, and how long a licensed one runs unverified — and either can move
+    /// without the other.
+    static let trialDays = 14
 
     /// A licensed copy keeps working this long without reaching Polar. Long
     /// enough to cover a holiday off the network, short enough that a refunded
