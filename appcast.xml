@@ -5,6 +5,18 @@
         <description>Updates for MicMyDay.</description>
         <language>en</language>
         <item>
+            <title>0.9.6</title>
+            <pubDate>Thu, 24 Sep 2026 06:53:09 +0000</pubDate>
+            <sparkle:version>14</sparkle:version>
+            <sparkle:shortVersionString>0.9.6</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>MicMyDay 0.9.6</h3>
+<ul>
+  <li>The trial now lasts fourteen days, which is what it was always meant to be. A trial already under way keeps the days it has and gains the difference.</li>
+</ul>]]></description>
+            <enclosure url="https://github.com/micmyday/micmyday/releases/download/v0.9.6/MicMyDay.dmg" length="23118856" type="application/octet-stream" sparkle:edSignature="bM0PzrB9TdKJLYa/twLblM72uQO4GOuxNSrwjHYpx0ZcZTTbOZjxWOIf9NwFrr9z59K8YqLaaKyRS+c64V0KAQ==" />
+        </item>
+        <item>
             <title>0.9.5</title>
             <pubDate>Wed, 23 Sep 2026 17:41:32 +0000</pubDate>
             <sparkle:version>13</sparkle:version>
