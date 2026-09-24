@@ -15,9 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.9.6</string>
+	<string>0.9.7</string>
 	<key>CFBundleVersion</key>
-	<string>14</string>
+	<string>15</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>
@@ -47,10 +47,6 @@
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
-	<!-- Required because the app is sandboxed: it tells Sparkle to install
-	     through its XPC installer rather than in-process, which the sandbox
-	     will not allow. Paired with the two mach-lookup names in the
-	     entitlements; either one alone does nothing. -->
 	<key>SUEnableInstallerLauncherService</key>
 	<true/>
 	<key>SUFeedURL</key>
