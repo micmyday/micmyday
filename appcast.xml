@@ -5,6 +5,20 @@
         <description>Updates for MicMyDay.</description>
         <language>en</language>
         <item>
+            <title>0.9.8</title>
+            <pubDate>Fri, 25 Sep 2026 19:28:34 +0000</pubDate>
+            <sparkle:version>17</sparkle:version>
+            <sparkle:shortVersionString>0.9.8</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>MicMyDay 0.9.8</h3>
+<ul>
+  <li>Setup now asks for Input Monitoring, which the shortcut needs and which it never asked for. Right Shift did nothing on a fresh install and said only that permissions were missing.</li>
+  <li>Accessibility is asked for last, since it is the only permission that needs a restart. The three that take effect at once are done before the restart interrupts anything.</li>
+  <li>You can name the apps MicMyDay must never type into. Those get the transcript on the clipboard instead — for a password field, a terminal, or a chat box that sends on Return.</li>
+</ul>]]></description>
+            <enclosure url="https://github.com/micmyday/micmyday/releases/download/v0.9.8/MicMyDay.dmg" length="23128057" type="application/octet-stream" sparkle:edSignature="s/aKG6urtOL0zSbqiOsFXaw3WEHsNfE3l08uPdnsZ3Ws284iC/Y2kDJtu7ZEjiAzWo02CLmeP5CaaQIgvmJuAg==" />
+        </item>
+        <item>
             <title>0.9.7</title>
             <pubDate>Fri, 25 Sep 2026 10:44:54 +0000</pubDate>
             <sparkle:version>15</sparkle:version>
