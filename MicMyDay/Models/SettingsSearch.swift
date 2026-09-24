@@ -169,6 +169,15 @@ enum SettingsIndex {
         SettingsEntry(pane: .rewrite, card: "Profile shortcuts", aliases: [
             "per profile hotkey", "dedicated shortcut", "one press", "direct profile key",
         ], fallbackCard: "Rewriting"),
+        // "password" and "privacy" are here on purpose. Somebody looking for
+        // this is usually looking for a worry rather than for a feature, and
+        // the words they reach for are the worry's.
+        SettingsEntry(pane: .output, card: "Never paste into", aliases: [
+            "never paste into", "excluded apps", "exclude app", "exclusion list",
+            "app exclusions", "blocklist", "ignore app", "do not paste",
+            "don't type into", "password manager", "password", "1password",
+            "terminal", "confidential", "sensitive apps", "privacy", "per app",
+        ]),
         SettingsEntry(pane: .output, card: "Insert again", aliases: [
             "if it lands in the wrong place", "insert last transcript",
             "insert again", "paste again", "retype", "lost text", "wrong window",

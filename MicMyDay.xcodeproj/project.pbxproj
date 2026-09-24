@@ -134,6 +134,7 @@
 		C3B9B05B7450FCEF05136DD1 /* DockStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B34DC01AF86E7314C45734 /* DockStyle.swift */; };
 		C3E1ED9381DCC6BF5D456295 /* RewriteModelCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649412D0C9B35B3AA785D230 /* RewriteModelCatalog.swift */; };
 		C6BDBB3738B6157C88C50FC5 /* UsageStatisticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58123F3BD80A5D5F3ECC9D6 /* UsageStatisticsTests.swift */; };
+		C71337F558E7B4BC73CCF871 /* NeverPasteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF6D23A2890F23BD0092FBBE /* NeverPasteTests.swift */; };
 		C77D3B783BE7362812D708C3 /* AudioInputDeviceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA120D250A093695E7E89011 /* AudioInputDeviceManagerTests.swift */; };
 		C7CA270C31114F70C4FB6FB8 /* RewriteChapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 746C75926913F1550104B160 /* RewriteChapter.swift */; };
 		CB30C65EBC264E3B1C0ADD93 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 52760C61C50677D0C2C97832 /* PrivacyInfo.xcprivacy */; };
@@ -358,6 +359,7 @@
 		FA12BAC8ED995030E59246C3 /* MicMyDay.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MicMyDay.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB7E838D5BA9F3EA8F4A762D /* StreamingModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamingModeTests.swift; sourceTree = "<group>"; };
 		FC66F5665318471778AB7099 /* EngineLanguageSupportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineLanguageSupportTests.swift; sourceTree = "<group>"; };
+		FF6D23A2890F23BD0092FBBE /* NeverPasteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NeverPasteTests.swift; sourceTree = "<group>"; };
 		FFD02A4456D8620C875AD490 /* FeedbackSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackSoundPlayer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -469,6 +471,7 @@
 				0CEE063FA7816D7796C40FF5 /* LocalRewriteModelTests.swift */,
 				9F214F1E9457EE28CEC752D2 /* MultipartFormDataTests.swift */,
 				150BB2166C09EAD1646EE24A /* NamedProfileConfigurationTests.swift */,
+				FF6D23A2890F23BD0092FBBE /* NeverPasteTests.swift */,
 				D992E236C8DC4D51F9F3A504 /* OpenAICompatibleTranscriberTests.swift */,
 				2CE806FF8EA2B314DD5520E6 /* OverlayPreparationTests.swift */,
 				5553291324870135022C5772 /* ParakeetSilenceProbeTests.swift */,
@@ -898,6 +901,7 @@
 				96EA1E172E71B89CC90BF436 /* LocalRewriteModelTests.swift in Sources */,
 				480BB7DDFE57734ECD2E150C /* MultipartFormDataTests.swift in Sources */,
 				61F379E25A8A74F36198A942 /* NamedProfileConfigurationTests.swift in Sources */,
+				C71337F558E7B4BC73CCF871 /* NeverPasteTests.swift in Sources */,
 				D7834C82BA75867B6C08532B /* OpenAICompatibleTranscriberTests.swift in Sources */,
 				0F0AE15CE67AFB742A800897 /* OverlayPreparationTests.swift in Sources */,
 				351FF33353373FE5430AA97A /* ParakeetSilenceProbeTests.swift in Sources */,

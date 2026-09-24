@@ -265,6 +265,7 @@ final class SettingsStore: ObservableObject {
         static let streamingMode = "streamingMode"
         static let theme = "theme"
         static let automaticPaste = "automaticPaste"
+        static let neverPasteBundleIDs = "neverPasteBundleIDs"
     }
 
     private let defaults: UserDefaults
@@ -597,6 +598,31 @@ final class SettingsStore: ObservableObject {
     /// person makes depends on the language they are speaking.
     @Published var fillerWords: [String] {
         didSet { defaults.set(fillerWords, forKey: Key.fillerWords) }
+    }
+
+    /// Bundle identifiers MicMyDay will never type into.
+    ///
+    /// Not a privacy setting, whatever it looks like: the microphone still
+    /// opens and the words are still transcribed. What it prevents is text
+    /// arriving somewhere it should not have — a password field, a terminal,
+    /// a chat box that sends on Return. The transcript goes to the clipboard
+    /// instead, which is exactly what happens with automatic pasting off, so
+    /// this is that switch narrowed to one app.
+    ///
+    /// Bundle identifiers rather than names or paths: a name is not unique
+    /// and changes with the system language, and a path changes the moment
+    /// somebody moves the app.
+    @Published var neverPasteBundleIDs: [String] {
+        didSet { defaults.set(neverPasteBundleIDs, forKey: Key.neverPasteBundleIDs) }
+    }
+
+    /// Whether a transcript is allowed to be typed into this app.
+    ///
+    /// Nil is the case where nothing is in front, which is not an excluded
+    /// app and must not be treated as one.
+    func allowsAutomaticPaste(intoBundleID bundleID: String?) -> Bool {
+        guard let bundleID else { return true }
+        return !neverPasteBundleIDs.contains(bundleID)
     }
 
     /// What to press once the transcript has been pasted, for every dictation.
@@ -976,6 +1002,10 @@ final class SettingsStore: ObservableObject {
         // A stored empty list means the user emptied it deliberately, which is
         // different from never having had one, so `object(forKey:)` decides.
         fillerWords = defaults.object(forKey: Key.fillerWords) as? [String] ?? FillerWords.defaults
+        // Empty by default. Guessing at which apps somebody considers
+        // sensitive would be wrong as often as it was right, and an app the
+        // user never chose appearing in this list reads as a bug.
+        neverPasteBundleIDs = defaults.object(forKey: Key.neverPasteBundleIDs) as? [String] ?? []
         if let stored = defaults.string(forKey: Key.autoSendKey) {
             autoSendKey = AutoSendKey(rawValue: stored) ?? .off
         } else if let data = defaults.data(forKey: Key.profileAutoSend),

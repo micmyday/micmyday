@@ -4058,7 +4058,18 @@ final class AppState: ObservableObject {
     ) {
         // With automatic pasting off, there is no destination: the transcript
         // goes to the clipboard and the user places it themselves.
-        let insertionTarget = settings.automaticPasteEnabled ? insertionTarget : nil
+        //
+        // An excluded app takes the same road. Dropping the target rather
+        // than adding a branch further down means the exclusion cannot
+        // diverge from the setting it narrows: whatever "no automatic paste"
+        // does today, it does here too, including the phase the overlay
+        // shows and the clipboard the transcript lands on.
+        let excluded = !settings.allowsAutomaticPaste(
+            intoBundleID: insertionTarget.flatMap {
+                NSRunningApplication(processIdentifier: $0)?.bundleIdentifier
+            }
+        )
+        let insertionTarget = (settings.automaticPasteEnabled && !excluded) ? insertionTarget : nil
         // The configuration the recording started under, when one was
         // captured for this same session: a setting changed mid-take must not
         // hand the preview and the final pass different models or languages.

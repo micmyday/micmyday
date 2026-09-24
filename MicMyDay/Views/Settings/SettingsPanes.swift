@@ -157,6 +157,17 @@ SettingsCard(
         ) {
             InsertAgainShortcutRow()
         }
+
+        // Last in the pane: an exception to automatic pasting, and shown only
+        // when there is automatic pasting for it to be an exception to.
+        if settings.automaticPasteEnabled {
+            SettingsCard(
+                eyebrow: "Never paste into",
+                caption: "These apps get the transcript on the clipboard instead. Nothing is typed into them."
+            ) {
+                NeverPasteList()
+            }
+        }
     }
 }
 
@@ -519,6 +530,87 @@ private struct EditSelectionShortcutRow: View {
                 .help("Clear shortcut")
             }
         }
+    }
+}
+
+/// The apps MicMyDay will not type into, and the button that adds one.
+///
+/// Apps are chosen from /Applications rather than typed as bundle
+/// identifiers, and rather than picked from a list of what happens to be
+/// running: the app somebody wants excluded is usually one they are careful
+/// about opening, and a password manager that is currently closed would be
+/// missing from exactly the list they came here to use.
+private struct NeverPasteList: View {
+    @EnvironmentObject private var settings: SettingsStore
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(settings.neverPasteBundleIDs, id: \.self) { bundleID in
+                row(for: bundleID)
+            }
+            Button {
+                add()
+            } label: {
+                Label("Add app…", systemImage: "plus")
+                    .font(.system(size: 12))
+            }
+            .buttonStyle(.beaconPlain)
+        }
+    }
+
+    private func row(for bundleID: String) -> some View {
+        HStack(spacing: 10) {
+            icon(for: bundleID)
+                .resizable()
+                .frame(width: 18, height: 18)
+            // The identifier as a fallback, not as the label: it is what was
+            // actually stored, so an app that has since been deleted is still
+            // recognisable enough to remove.
+            Text(name(for: bundleID) ?? bundleID)
+                .font(.system(size: 12))
+                .foregroundStyle(Color.mfTextPrimary)
+            Spacer(minLength: 8)
+            Button {
+                settings.neverPasteBundleIDs.removeAll { $0 == bundleID }
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.mfTextPrimary.opacity(0.4))
+            }
+            .buttonStyle(.plain)
+            .help("Let MicMyDay paste into this app again")
+        }
+    }
+
+    private func add() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.application]
+        panel.directoryURL = URL(fileURLWithPath: "/Applications")
+        panel.allowsMultipleSelection = true
+        NSApp.activate(ignoringOtherApps: true)
+        guard panel.runModal() == .OK else { return }
+        for url in panel.urls {
+            guard let bundleID = Bundle(url: url)?.bundleIdentifier else { continue }
+            guard !settings.neverPasteBundleIDs.contains(bundleID) else { continue }
+            settings.neverPasteBundleIDs.append(bundleID)
+        }
+    }
+
+    private func url(for bundleID: String) -> URL? {
+        NSWorkspace.shared.urlForApplication(withBundleIdentifier: bundleID)
+    }
+
+    private func name(for bundleID: String) -> String? {
+        url(for: bundleID).flatMap {
+            FileManager.default.displayName(atPath: $0.path)
+        }?.replacingOccurrences(of: ".app", with: "")
+    }
+
+    private func icon(for bundleID: String) -> Image {
+        guard let url = url(for: bundleID) else {
+            return Image(systemName: "app.dashed")
+        }
+        return Image(nsImage: NSWorkspace.shared.icon(forFile: url.path))
     }
 }
 
