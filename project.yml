@@ -81,6 +81,18 @@ targets:
         com.apple.security.device.microphone: true
         com.apple.security.network.client: true
         com.apple.security.files.user-selected.read-only: true
+        # Sparkle's installer, which runs outside the sandbox because replacing
+        # the application bundle is exactly what a sandbox forbids. The
+        # framework ships Installer.xpc and Downloader.xpc and the build
+        # already copies them; these two names are how the app is allowed to
+        # speak to them. Paired with SUEnableInstallerLauncherService in
+        # Info.plist — either alone does nothing. Without both, an update
+        # downloads and verifies and then fails at the last step with "An
+        # error occurred while launching the installer", which is the one part
+        # of updating that inspecting the feed cannot catch.
+        com.apple.security.temporary-exception.mach-lookup.global-name:
+          - $(PRODUCT_BUNDLE_IDENTIFIER)-spks
+          - $(PRODUCT_BUNDLE_IDENTIFIER)-spki
 
   MicMyDayTests:
     type: bundle.unit-test

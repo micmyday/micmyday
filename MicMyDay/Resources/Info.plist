@@ -47,6 +47,12 @@
 	<false/>
 	<key>SUEnableAutomaticChecks</key>
 	<true/>
+	<!-- Required because the app is sandboxed: it tells Sparkle to install
+	     through its XPC installer rather than in-process, which the sandbox
+	     will not allow. Paired with the two mach-lookup names in the
+	     entitlements; either one alone does nothing. -->
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/micmyday/micmyday/main/appcast.xml</string>
 	<key>SUPublicEDKey</key>
