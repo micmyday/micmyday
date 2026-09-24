@@ -297,6 +297,7 @@ struct OnboardingView: View {
             var granted: [String] = []
             if appState.microphoneGranted { granted.append("Mic") }
             if appState.speechGranted { granted.append("speech") }
+            if appState.inputMonitoringGranted { granted.append("shortcut") }
             if appState.accessibilityGranted { granted.append("auto-paste") }
             return granted.isEmpty ? "Nothing granted yet" : granted.joined(separator: ", ")
         case .engine:
@@ -350,6 +351,7 @@ struct OnboardingView: View {
             return appState.microphoneGranted
                 && appState.speechGranted
                 && appState.accessibilityGranted
+                && appState.inputMonitoringGranted
         case .setup:
             return setupSatisfied
         default:
@@ -397,8 +399,12 @@ struct OnboardingView: View {
     private var primaryLabel: String {
         switch chapter {
         case .access:
+            // Same order the rows are in, so the button always names the one
+            // the eye lands on next. Accessibility is asked for last because
+            // it is the only one that needs a restart.
             if !appState.microphoneGranted { return "Allow the microphone to continue" }
             if !appState.speechGranted { return "Allow speech recognition to continue" }
+            if !appState.inputMonitoringGranted { return "Allow input monitoring to continue" }
             if appState.accessibilityAllowedPendingRestart { return "Restart to finish" }
             if !appState.accessibilityGranted { return "Allow accessibility to continue" }
             return "Continue"

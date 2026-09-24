@@ -17,14 +17,6 @@ struct VoiceChapter: View {
 
             shortcutRow
 
-            if settings.shortcut.isModifierOnly && !appState.inputMonitoringGranted {
-                Text("Input Monitoring is required for single-modifier shortcuts such as right Shift or Fn.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.mfTextPrimary.opacity(0.7))
-                Button("Allow Input Monitoring") { appState.requestInputMonitoringPermission() }
-                    .buttonStyle(.beacon)
-            }
-
             HStack(alignment: .top, spacing: 12) {
                 ForEach(ShortcutActivationMode.allCases) { mode in
                     BehaviourCard(mode: mode, isSelected: settings.shortcutMode == mode) {

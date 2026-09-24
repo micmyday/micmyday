@@ -1,9 +1,17 @@
 import AppKit
 import SwiftUI
 
-/// 02 Access — the three macOS permissions.
+/// 02 Access — the four macOS permissions.
 ///
-/// All three are required before setup can go on. A half-granted install
+/// Accessibility is last on purpose. It is the only one that cannot take
+/// effect until the app restarts, so it belongs after the three that are
+/// done in a moment: everything else is finished by the time the restart
+/// interrupts anything.
+///
+/// All four are required before setup can go on. A half-granted install fails
+/// much later and far from its cause: a shortcut that does nothing, a
+/// dictation that lands on the clipboard instead of in the document, or an
+/// engine that will not start. A half-granted install
 /// fails much later and far from its cause: a dictation that lands on the
 /// clipboard instead of in the document, or an engine that will not start.
 ///
@@ -21,7 +29,7 @@ struct AccessChapter: View {
         VStack(alignment: .leading, spacing: 24) {
             ChapterHeading(
                 title: "Set up permissions",
-                lede: "Allow microphone, Speech Recognition and Accessibility access to continue."
+                lede: "Allow microphone, Speech Recognition, Input Monitoring and Accessibility access to continue."
             )
 
             VStack(spacing: 10) {
@@ -51,6 +59,27 @@ struct AccessChapter: View {
                     isGranted: appState.speechGranted,
                     warning: nil,
                     action: { appState.requestSpeechPermission() }
+                )
+
+                // Asked here rather than only where it is configured, because
+                // the shortcut everybody starts with is Right Shift, and a
+                // shortcut that is one modifier cannot be registered as an
+                // ordinary hotkey — it needs an event tap, and an event tap
+                // needs this. Without it the first press of the default
+                // shortcut does nothing and reports missing permissions,
+                // which is the worst possible first impression: the app
+                // appears broken at the exact moment it is meant to work.
+                PermissionRow(
+                    title: "Input Monitoring",
+                    explanation: "Required for the shortcut. MicMyDay watches for the key you press to start dictation, and nothing else.",
+                    doneText: "MicMyDay can see your shortcut.",
+                    grantedLabel: "Allowed",
+                    actionTitle: "Open System Settings",
+                    prominent: false,
+                    optional: false,
+                    isGranted: appState.inputMonitoringGranted,
+                    warning: nil,
+                    action: { appState.requestInputMonitoringPermission() }
                 )
 
                 PermissionRow(
