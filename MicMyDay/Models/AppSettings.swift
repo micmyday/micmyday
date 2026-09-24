@@ -149,17 +149,23 @@ struct KeyboardShortcut: Codable, Equatable {
         keyLabel: "V"
     )
 
-    /// Shift-Right Arrow switches to the next rewrite profile.
+    /// Control-Option-Command-Right Arrow switches to the next rewrite profile.
+    ///
+    /// Three modifiers rather than one, and the same three that insert again
+    /// uses above. Shift-Arrow was the wrong thing to take: it selects text in
+    /// every writing app there is, which is precisely where somebody is
+    /// standing when they reach for a different profile. A shortcut that
+    /// arrives mid-sentence and eats a selection is worse than no shortcut.
     static let cycleProfilesDefault = KeyboardShortcut(
         keyCode: UInt32(kVK_RightArrow),
-        modifiers: UInt32(shiftKey),
+        modifiers: UInt32(cmdKey) | UInt32(optionKey) | UInt32(controlKey),
         keyLabel: "→"
     )
 
-    /// Shift-Left Arrow switches to the previous rewrite profile.
+    /// Control-Option-Command-Left Arrow switches to the previous one.
     static let previousProfileDefault = KeyboardShortcut(
         keyCode: UInt32(kVK_LeftArrow),
-        modifiers: UInt32(shiftKey),
+        modifiers: UInt32(cmdKey) | UInt32(optionKey) | UInt32(controlKey),
         keyLabel: "←"
     )
 

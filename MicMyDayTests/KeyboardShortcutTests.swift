@@ -19,18 +19,24 @@ final class KeyboardShortcutTests: XCTestCase {
     }
 
     @MainActor
-    func testFreshSettingsCycleProfilesWithShiftArrowKeys() {
+    func testFreshSettingsCycleProfilesWithControlOptionCommandArrowKeys() {
         let name = "KeyboardShortcutTests.cycleDefault"
         let defaults = UserDefaults(suiteName: name)!
         defaults.removePersistentDomain(forName: name)
         defer { defaults.removePersistentDomain(forName: name) }
         let settings = SettingsStore(defaults: defaults, keychain: KeychainStore(service: name))
         XCTAssertEqual(settings.cycleProfilesShortcut?.keyCode, UInt32(kVK_RightArrow))
-        XCTAssertEqual(settings.cycleProfilesShortcut?.modifiers, UInt32(shiftKey))
-        XCTAssertEqual(settings.cycleProfilesShortcut?.displayString, "⇧→")
+        XCTAssertEqual(
+            settings.cycleProfilesShortcut?.modifiers,
+            UInt32(cmdKey) | UInt32(optionKey) | UInt32(controlKey)
+        )
+        XCTAssertEqual(settings.cycleProfilesShortcut?.displayString, "⌃⌥⌘→")
         XCTAssertEqual(settings.previousProfileShortcut?.keyCode, UInt32(kVK_LeftArrow))
-        XCTAssertEqual(settings.previousProfileShortcut?.modifiers, UInt32(shiftKey))
-        XCTAssertEqual(settings.previousProfileShortcut?.displayString, "⇧←")
+        XCTAssertEqual(
+            settings.previousProfileShortcut?.modifiers,
+            UInt32(cmdKey) | UInt32(optionKey) | UInt32(controlKey)
+        )
+        XCTAssertEqual(settings.previousProfileShortcut?.displayString, "⌃⌥⌘←")
     }
 
     @MainActor
