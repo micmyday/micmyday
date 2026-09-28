@@ -242,12 +242,28 @@ struct PolarLicenseAPI: LicenseAPI {
         _ = try await send(request(for: "deactivate", body: body))
     }
 
+    /// The Polar API contract this app is written against.
+    ///
+    /// Pinned deliberately. Polar releases a dated version each quarter and an
+    /// unpinned request follows whichever is current, so the contract would
+    /// change under copies of MicMyDay already installed on machines nobody can
+    /// update in time. A licence check that starts failing is not a cosmetic
+    /// fault: it locks paying customers out of an app they have bought.
+    ///
+    /// 2026-04 is what the decoding below was written and tested against.
+    /// Moving to a newer version is a deliberate act: read that version's
+    /// changes, check `ActivationEnvelope` and `ValidationEnvelope` still
+    /// match, ship, and only then change this string. A version stays supported
+    /// for roughly nine months, so there is no hurry.
+    static let apiVersion = "2026-04"
+
     // MARK: - Transport
 
     private func request<Body: Encodable>(for path: String, body: Body) throws -> URLRequest {
         var request = URLRequest(url: baseURL.appendingPathComponent(path))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(Self.apiVersion, forHTTPHeaderField: "Polar-Version")
         // A licence check must never hold up the app for long: everything that
         // depends on it has a cached answer to fall back on.
         request.timeoutInterval = 12
