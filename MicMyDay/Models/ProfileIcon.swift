@@ -68,6 +68,10 @@ struct ProfileIcon: Identifiable, Hashable {
         case "cleanup": return "eraser"
         case "agentPrompt": return "terminal"
         case "email": return "mail"
+        // Quotation marks rather than a wand: this is the one entry that
+        // leaves the words exactly as they were spoken, and every sparkle in
+        // the list means something was changed.
+        case RewriteProfile.none.id: return "quote"
         default: return "sparkles"
         }
     }

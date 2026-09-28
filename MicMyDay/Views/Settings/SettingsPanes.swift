@@ -652,7 +652,7 @@ private struct ProfileShortcutList: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            ForEach(settings.rewriteProfiles) { profile in
+            ForEach(settings.selectableRewriteProfiles) { profile in
                 HStack(spacing: 12) {
                     Text(profile.name)
                         .font(.system(size: 12))

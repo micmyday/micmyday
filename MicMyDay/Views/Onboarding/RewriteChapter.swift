@@ -526,7 +526,7 @@ struct RewriteProfilesSection: View {
             }
 
             LazyVGrid(columns: columns, spacing: 10) {
-                ForEach(settings.rewriteProfiles) { profile in
+                ForEach(settings.selectableRewriteProfiles) { profile in
                     profilePill(profile)
                 }
             }
@@ -581,6 +581,16 @@ struct RewriteProfilesSection: View {
     @ViewBuilder
     private var editor: some View {
         let id = settings.rewriteProfileID
+        // "No rewrite" has nothing to edit, so it says what it does instead of
+        // offering an empty box. An instructions field on it would invite
+        // somebody to type into it and wonder why nothing happened.
+        if id == RewriteProfile.none.id {
+            Text("Transcripts are inserted exactly as they were dictated. Choose another profile to have them rewritten.")
+                .font(.system(size: 11))
+                .foregroundStyle(Color.mfTextPrimary.opacity(0.62))
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.top, 2)
+        } else {
         VStack(alignment: .leading, spacing: 9) {
             HStack(spacing: 10) {
                 Text(currentProfile?.name.uppercased() ?? "PROMPT")
@@ -624,6 +634,7 @@ struct RewriteProfilesSection: View {
             Text("These instructions guide rewrites with this profile. Rewriting uses transcript text, not audio.")
                 .font(.system(size: 11))
                 .foregroundStyle(Color.mfTextPrimary.opacity(0.4))
+        }
         }
     }
 

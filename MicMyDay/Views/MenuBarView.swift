@@ -205,7 +205,7 @@ struct MenuBarView: View {
                                  : Color.mfAccent)
                 .fixedSize()
             ProfilePopUp(
-                profiles: settings.rewriteProfiles,
+                profiles: settings.selectableRewriteProfiles,
                 selection: $settings.rewriteProfileID
             )
             .frame(maxWidth: .infinity)
@@ -630,9 +630,9 @@ struct MenuBarView: View {
                 Button("As spoken") {
                     appState.pickAudioFileForTranscription(rewrite: .asSpoken)
                 }
-                if !settings.rewriteProfiles.isEmpty {
+                if !settings.selectableRewriteProfiles.isEmpty {
                     Divider()
-                    ForEach(settings.rewriteProfiles) { profile in
+                    ForEach(settings.selectableRewriteProfiles) { profile in
                         Button(profile.name) {
                             appState.pickAudioFileForTranscription(rewrite: .profile(profile.id))
                         }
@@ -640,13 +640,13 @@ struct MenuBarView: View {
                 }
             }
             Menu("Rewrite Text") {
-                ForEach(settings.rewriteProfiles) { profile in
+                ForEach(settings.selectableRewriteProfiles) { profile in
                     Button(profile.name) {
                         appState.rewriteClipboardText(profileID: profile.id)
                     }
                 }
             }
-            .disabled(settings.rewriteProfiles.isEmpty)
+            .disabled(settings.selectableRewriteProfiles.isEmpty)
         } label: {
             // Plain, at the row's own size, with no icon sizing of its own:
             // this symbol draws 14 by 14 at 12pt, the clock's exact box, so

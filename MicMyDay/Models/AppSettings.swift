@@ -680,8 +680,18 @@ final class SettingsStore: ObservableObject {
     /// The rewrite profile currently selected, or nil when `rewriteProfileID`
     /// dangles. Every surface that names or applies the active profile goes
     /// through here so they can never disagree.
+    /// The profiles as they appear anywhere one is chosen.
+    ///
+    /// `rewriteProfiles` is the stored, editable list; this adds the standing
+    /// "No rewrite" entry to the end of it. Kept apart so that nothing which
+    /// edits, reorders or deletes profiles can touch an entry that is not a
+    /// profile and has nothing to edit.
+    var selectableRewriteProfiles: [RewriteProfile] {
+        rewriteProfiles + [.none]
+    }
+
     var currentRewriteProfile: RewriteProfile? {
-        rewriteProfiles.first { $0.id == rewriteProfileID }
+        selectableRewriteProfiles.first { $0.id == rewriteProfileID }
     }
 
     /// Custom endpoints default to asking the server for its model list; these
@@ -696,10 +706,16 @@ final class SettingsStore: ObservableObject {
     /// Moves forward or backward, wrapping. Returns the profile now selected.
     @discardableResult
     func cycleRewriteProfile(backwards: Bool = false) -> RewriteProfile? {
-        guard !rewriteProfiles.isEmpty else { return nil }
-        let index = rewriteProfiles.firstIndex { $0.id == rewriteProfileID } ?? (backwards ? 0 : -1)
+        // The stored profiles only. Cycling is for moving between the ways a
+        // transcript gets rewritten, and threading a no-op through that loop
+        // would put a dead step in every lap for everybody. "No rewrite" is
+        // still reachable by shortcut: it can be bound directly, like any
+        // profile.
+        let profiles = rewriteProfiles
+        guard !profiles.isEmpty else { return nil }
+        let index = profiles.firstIndex { $0.id == rewriteProfileID } ?? (backwards ? 0 : -1)
         let step = backwards ? -1 : 1
-        let next = rewriteProfiles[(index + step + rewriteProfiles.count) % rewriteProfiles.count]
+        let next = profiles[(index + step + profiles.count) % profiles.count]
         rewriteProfileID = next.id
         return next
     }
@@ -1166,6 +1182,10 @@ final class SettingsStore: ObservableObject {
         // Onboarding allows leaving with rewriting on but no provider set up
         // ("Continue without connecting"). Returning a config anyway made every
         // dictation attempt a doomed request and surface a failure note.
+        // Chosen deliberately, so nothing is rewritten. Returning no
+        // configuration is the same path an unreachable provider takes, which
+        // is already the one that inserts the transcript untouched.
+        if (profileID ?? rewriteProfileID) == RewriteProfile.none.id { return nil }
         guard rewriteProviderIsConfigured else { return nil }
         let profile: RewriteProfile
         if let profileID {

@@ -11,6 +11,19 @@ struct RewriteProfile: Identifiable, Codable, Equatable {
     var name: String
     let builtin: Bool
 
+    /// Chosen instead of a profile, to insert exactly what was transcribed.
+    ///
+    /// Not one of `builtins` and never stored: it cannot be renamed, edited or
+    /// deleted, because there is nothing in it to change. It is offered
+    /// wherever a profile is chosen so that raw text is a decision made in the
+    /// moment, alongside the profiles, rather than a switch in Settings that
+    /// has to be turned off before dictating and remembered afterwards \u{2014}
+    /// and forgetting is how somebody ends up with every later dictation raw.
+    ///
+    /// The id is deliberately unlike a profile id anybody would type. A custom
+    /// profile that collided with it would be silently unable to rewrite.
+    static let none = RewriteProfile(id: "__none__", name: "No rewrite", builtin: true)
+
     static let builtins: [RewriteProfile] = [
         RewriteProfile(id: "cleanup", name: "Clean up dictation", builtin: true),
         RewriteProfile(id: "agentPrompt", name: "AI agent prompt", builtin: true),

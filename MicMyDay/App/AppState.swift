@@ -2688,7 +2688,7 @@ final class AppState: ObservableObject {
         if let again = settings.insertAgainShortcut {
             shortcuts["again"] = again
         }
-        for profile in settings.rewriteProfiles {
+        for profile in settings.selectableRewriteProfiles {
             if let shortcut = settings.profileShortcuts[profile.id] {
                 shortcuts["profile:\(profile.id)"] = shortcut
             }
@@ -2712,7 +2712,7 @@ final class AppState: ObservableObject {
         }
         guard action.hasPrefix("profile:") else { return }
         let id = String(action.dropFirst("profile:".count))
-        guard settings.rewriteProfiles.contains(where: { $0.id == id }) else { return }
+        guard settings.selectableRewriteProfiles.contains(where: { $0.id == id }) else { return }
         settings.rewriteProfileID = id
         guard phase == .idle else { return }
         toggleRecording()
@@ -2934,7 +2934,7 @@ final class AppState: ObservableObject {
     /// The overlay's profile picker: the same selection and the same toast as
     /// the cycle shortcut, so every way of switching feels identical.
     private func selectProfileFromOverlay(_ id: String) {
-        guard settings.rewriteProfiles.contains(where: { $0.id == id }) else { return }
+        guard settings.selectableRewriteProfiles.contains(where: { $0.id == id }) else { return }
         guard settings.rewriteProfileID != id else { return }
         settings.rewriteProfileID = id
         if let name = settings.currentRewriteProfile?.name {
@@ -3077,7 +3077,7 @@ final class AppState: ObservableObject {
             ? overlayFinalText
             : ""
         let profileItems: [OverlayProfileItem] = settings.enhancementEnabled
-            ? settings.rewriteProfiles.map { item in
+            ? settings.selectableRewriteProfiles.map { item in
                 OverlayProfileItem(
                     id: item.id,
                     name: item.name,
