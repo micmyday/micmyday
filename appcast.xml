@@ -5,6 +5,20 @@
         <description>Updates for MicMyDay.</description>
         <language>en</language>
         <item>
+            <title>0.9.9</title>
+            <pubDate>Tue, 29 Sep 2026 20:14:47 +0000</pubDate>
+            <sparkle:version>18</sparkle:version>
+            <sparkle:shortVersionString>0.9.9</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
+            <description><![CDATA[<h3>MicMyDay 0.9.9</h3>
+<ul>
+  <li>A "No rewrite" choice now sits with your profiles, so you can take a raw transcript for one dictation without turning rewriting off in Settings and remembering to turn it back on. It can have a shortcut like any profile, and because a profile shortcut also starts recording, one key means "dictate this one exactly as I say it".</li>
+  <li>Rewriting no longer answers what you dictated. Saying "write me an SQL query for the overdue invoices" gave you the query instead of the sentence you were composing; it is treated as words to tidy, not an instruction to carry out.</li>
+  <li>A new app icon.</li>
+</ul>]]></description>
+            <enclosure url="https://github.com/micmyday/micmyday/releases/download/v0.9.9/MicMyDay.dmg" length="24783691" type="application/octet-stream" sparkle:edSignature="QyRRzBAR0at0KLg+9kLztetAJ78z+O9Y7/e0vKGR8suv9DRuUAKXhKzqaiN1uqXSbfftT0sgg484PBA0KGjWDw==" />
+        </item>
+        <item>
             <title>0.9.8</title>
             <pubDate>Fri, 25 Sep 2026 19:28:34 +0000</pubDate>
             <sparkle:version>17</sparkle:version>
