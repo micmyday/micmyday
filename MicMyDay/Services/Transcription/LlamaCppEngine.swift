@@ -210,8 +210,12 @@ final class LlamaCppEngine: @unchecked Sendable {
         // stripReasoning is a safety net, not the mechanism: the prompt format
         // already tells a reasoning model not to think. It stays because a
         // model that ignores that must not paste its deliberations.
-        let text = Self.stripReasoning(String(cString: produced))
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        // The envelope's tags are stripped for the same reason the reasoning
+        // is: a model that echoes them must not put `<transcript>` in somebody's
+        // email.
+        let text = TranscriptEnvelope.strip(
+            Self.stripReasoning(String(cString: produced))
+        ).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { throw TranscriptionError.emptyResponse }
         // After the text is in hand, so counting can never be in its way.
         counted?(Int(tokensIn), Int(tokensOut), began.duration(to: .now).seconds)

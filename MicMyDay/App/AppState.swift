@@ -4102,6 +4102,9 @@ final class AppState: ObservableObject {
             // text to insert, so the profile's prompt is set aside: a cleanup
             // prompt applied to an instruction would tidy the instruction.
             enhancement?.systemPrompt = VoiceEdit.instruction
+            // VoiceEdit.message already frames the passage and the instruction,
+            // so the transcript envelope would be a second, contradictory wrapper.
+            enhancement?.quotesTranscript = false
             enhancement?.profileID = "edit-selection"
             enhancement?.profileName = "Edit selection"
             _ = edit

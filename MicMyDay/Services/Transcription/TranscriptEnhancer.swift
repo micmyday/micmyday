@@ -22,6 +22,17 @@ struct EnhancementConfiguration {
     /// what the user was doing and not only by which model did it.
     var profileID: String = ""
     var profileName: String = ""
+    /// Whether the transcript is quoted before the model sees it.
+    ///
+    /// True for an ordinary rewrite, where the text is raw dictation and a
+    /// spoken "write me an SQL query" would otherwise be obeyed rather than
+    /// tidied — see `TranscriptEnvelope`.
+    ///
+    /// False for an edit by voice, where the text is already a composed message
+    /// carrying its own passage and instruction. Quoting that and calling it
+    /// something not addressed to the model contradicts the instruction the
+    /// speaker deliberately gave, and the edit silently does nothing.
+    var quotesTranscript = true
 }
 
 /// Post-processes a transcript through an OpenAI-compatible chat completions endpoint.
@@ -67,7 +78,9 @@ final class TranscriptEnhancer {
                 // failed one contributes nothing.
                 let began = ContinuousClock.now
                 let rewritten = try await AppleOnDeviceRewriter.rewrite(
-                    transcript,
+                    configuration.quotesTranscript
+                        ? TranscriptEnvelope.user(for: transcript)
+                        : transcript,
                     systemPrompt: configuration.systemPrompt
                 )
                 let elapsed = began.duration(to: .now).seconds
@@ -102,7 +115,9 @@ final class TranscriptEnhancer {
             // measurement is assembled after the call rather than inside it.
             var counts: (Int, Int, Double) = (0, 0, 0)
             let rewritten = try await LlamaCppEngine.shared.rewrite(
-                transcript: transcript,
+                transcript: configuration.quotesTranscript
+                    ? TranscriptEnvelope.user(for: transcript)
+                    : transcript,
                 systemPrompt: configuration.systemPrompt,
                 modelPath: path,
                 format: download.format,
